@@ -27,7 +27,6 @@ later(function()
 		"https://github.com/jpwol/thorn.nvim",
 		"https://github.com/mcauley-penney/techbase.nvim",
 		"https://github.com/mitander/flume.nvim",
-		"https://github.com/mryodo/rwth.nvim",
 		"https://github.com/nendix/zen.nvim",
 		"https://github.com/nyoom-engineering/oxocarbon.nvim",
 		"https://github.com/slugbyte/lackluster.nvim",
@@ -37,8 +36,6 @@ later(function()
 		"https://github.com/webhooked/kanso.nvim",
 		"https://github.com/ThorstenRhau/token",
 	})
-
-	require("rwth").setup({ transparent = false })
 
 	-- 'circadia' nests its Neovim port under 'ports/neovim' rather than the
 	-- plugin root, so its `lua/circadia` module is invisible to the native
@@ -152,13 +149,15 @@ now(function()
 		"https://codeberg.org/navahas/sanzo.nvim",
 	})
 	add({ "https://github.com/oskarnurm/koda.nvim" })
+	add({ "https://github.com/mryodo/rwth.nvim" })
+	require("rwth").setup({ transparent = false })
 	require("koda").setup({ theme = { dark = "dark", light = "glade" } })
 
 	-- local background_schemes = { light = "sw1comm", dark = "hellbound" }
 	-- local background_schemes = { light = "sw1comm", dark = "sanzo" }
 	-- local background_schemes = { light = "ayugloom", dark = "ayugloom" }
-	local background_schemes = { light = "koda-dark", dark = "koda-dark" }
-	-- local background_schemes = { light = "rwth-light", dark = "rwth-dark" }
+	-- local background_schemes = { light = "koda-dark", dark = "koda-dark" }
+	local background_schemes = { light = "rwth-light", dark = "rwth-dark" }
 	-- local background_schemes = { light = "circadia-light", dark = "circadia-dark" }
 
 	-- Persisted across sessions so a new `nvim` starts in whatever 'background'
