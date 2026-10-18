@@ -157,7 +157,8 @@ now(function()
 	-- local background_schemes = { light = "sw1comm", dark = "hellbound" }
 	-- local background_schemes = { light = "sw1comm", dark = "sanzo" }
 	-- local background_schemes = { light = "ayugloom", dark = "ayugloom" }
-	local background_schemes = { light = "koda-dark", dark = "koda-dark" }
+	-- local background_schemes = { light = "koda-dark", dark = "koda-dark" }
+	local background_schemes = { light = "sw1comm", dark = "koda-dark" }
 	-- local background_schemes = { light = "rwth-light", dark = "rwth-dark" }
 	-- local background_schemes = { light = "circadia-light", dark = "circadia-dark" }
 
