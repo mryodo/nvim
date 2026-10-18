@@ -187,21 +187,52 @@ later(function()
 		["SHELL"]     = "Sh", ["TERMINAL"]  = "TE",
 	}
 
-	-- Mode colours come from the rwth lualine theme ('lua/lualine/themes/rwth.lua'
-	-- in rwth.nvim), so the blocks drawn here match the theme's own sections.
-	-- `load_theme` uses `dofile`, so re-reading it picks up the light/dark palette.
-	local mode_colors = {}
-	local theme_mode = {
-		n = "normal", i = "insert", v = "visual", V = "visual", ["\22"] = "visual",
-		s = "visual", S = "visual", ["\19"] = "visual", c = "command", ["!"] = "command",
-		R = "replace", r = "replace", t = "terminal",
-	}
+	--- Reads a colour straight out of a highlight group instead of hardcoding a
+	--- hex, so the status line follows whatever `:colorscheme` is active rather
+	--- than only ever agreeing with one scheme. `attr` is `"fg"` or `"bg"`;
+	--- `fallback` (an Ayu hex, so a scheme missing the group entirely still
+	--- renders something sane) is used when the group is unset or the running
+	--- Neovim has no GUI colours (`notermguicolors`).
+	local function hl_color(name, attr, fallback)
+		local ok, hl = pcall(vim.api.nvim_get_hl, 0, { name = name, link = false })
+		local value = ok and hl[attr]
+		return value and string.format("#%06x", value) or fallback
+	end
 
+	-- Semantic groups every colorscheme defines, mapped to the same roles the
+	-- old Ayu-literal palette used. `black` is the *background* of `Normal`,
+	-- not a foreground: it is the text colour painted over a filled mode
+	-- block, so it needs to read as "the editor's own background colour",
+	-- whatever that is.
+	local palette, mode_colors = {}, {}
+
+	--- Re-derive `palette` and `mode_colors` from the highlight groups the
+	--- active scheme defines. Run once at setup and again on every
+	--- `ColorScheme`, so switching schemes repaints the status line instead of
+	--- leaving it stuck on whatever theme was active at startup.
 	local function refresh_palette()
-		local theme = require("lualine.utils.loader").load_theme("rwth")
-		for key, name in pairs(theme_mode) do
-			mode_colors[key] = theme[name].a
-		end
+		palette.black = hl_color("Normal", "bg", "#0F131A")
+		palette.dark_gray = hl_color("Comment", "fg", "#70809b")
+		palette.red = hl_color("DiagnosticError", "fg", "#F07178")
+		palette.green = hl_color("String", "fg", "#AAD94C")
+		palette.blue = hl_color("Function", "fg", "#59C2FF")
+		palette.purple = hl_color("Statement", "fg", "#D2A6FF")
+		palette.orange = hl_color("DiagnosticWarn", "fg", "#FFB454")
+
+		-- Mode drives every colour on the line. Normal mode is the quiet state:
+		-- no block, just dim grey text. Every other mode fills the block with
+		-- its own colour, and the "secondary" items (linters, progress, search)
+		-- pick that same colour up as a foreground so the two ends of the line
+		-- agree.
+		-- stylua: ignore
+		mode_colors.n = palette.dark_gray; mode_colors.i = palette.green
+		mode_colors.v = palette.orange;    mode_colors.V = palette.orange
+		mode_colors["\22"] = palette.orange
+		mode_colors.c = palette.blue;      mode_colors["!"] = palette.blue
+		mode_colors.s = palette.purple;    mode_colors.S = palette.purple
+		mode_colors["\19"] = palette.purple; mode_colors.t = palette.purple
+		mode_colors.R = palette.red;       mode_colors.r = palette.red
+
 		pcall(function()
 			require("lualine").refresh()
 		end)
@@ -209,23 +240,28 @@ later(function()
 	refresh_palette()
 	Config.new_autocmd("ColorScheme", nil, refresh_palette, "Refresh statusline palette from theme")
 
-	local function mode_a()
-		return mode_colors[(vim.fn.mode(1) or "n"):sub(1, 1)] or mode_colors.n
+	local function mode_color()
+		return mode_colors[(vim.fn.mode(1) or "n"):sub(1, 1)] or palette.dark_gray
 	end
 
-	--- Filled block: the theme's mode section colours.
+	--- Filled block: the mode colour as a background, except in Normal mode.
 	local function primary()
-		local a = mode_a()
-		return { bg = a.bg, fg = a.fg }
+		local color = mode_color()
+		if color == palette.dark_gray then
+			return { fg = color }
+		end
+		return { bg = color, fg = palette.black }
 	end
 
 	--- Unfilled: the mode colour as a foreground.
 	local function secondary()
-		return { fg = mode_a().bg }
+		return { fg = mode_color() }
 	end
 
+	--- Divider between groups. Invisible in Normal mode so the quiet state stays
+	--- quiet, a bar as soon as anything is happening.
 	local function divider()
-		return "┃"
+		return mode_color() == palette.dark_gray and " " or "┃"
 	end
 
 	-- The same glyphs 'incline' puts in its badges ('plugin/93_ui.lua')
@@ -241,6 +277,15 @@ later(function()
 		return "  " .. os.date("%Hh%M") .. " "
 	end
 
+	-- Sections are coloured per component, so the theme only has to keep the
+	-- whole line on one background -- the same one the buffer line fills with.
+	local flat =
+		{ a = "StatusLine", b = "StatusLine", c = "StatusLine", x = "StatusLine", y = "StatusLine", z = "StatusLine" }
+	local flat_theme = {}
+	for _, mode in ipairs({ "normal", "insert", "visual", "replace", "command", "terminal", "inactive" }) do
+		flat_theme[mode] = vim.deepcopy(flat)
+	end
+
 	local function navic_available()
 		local ok, navic = pcall(require, "nvim-navic")
 		return ok and navic.is_available()
@@ -252,7 +297,7 @@ later(function()
 
 	require("lualine").setup({
 		options = {
-			theme = "rwth",
+			theme = flat_theme,
 			globalstatus = true, -- sets 'laststatus' to 3, making the status line global
 			component_separators = { left = "", right = "" },
 			section_separators = { left = "", right = "" },
