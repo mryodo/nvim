@@ -337,7 +337,7 @@
       "src": "git@github.com:oskarnurm/koda.nvim.git"
     },
     "rwth.nvim": {
-      "rev": "55244f158daecdecd1498226bcd511a2568f06e8",
+      "rev": "c766e7f196742b5cf097023c34307a126b847901",
       "src": "https://github.com/mryodo/rwth.nvim"
     },
     "sanzo.nvim": {
