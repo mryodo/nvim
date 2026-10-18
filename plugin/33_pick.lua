@@ -1,0 +1,24 @@
+-- ┌───────────┐
+-- │ mini.pick │
+-- └───────────┘
+--
+-- The main picker is 'fzf-lua' ('plugin/95_fzf.lua'), which is loaded later and
+-- therefore wins for every `<Leader>f` key it defines. 'mini.pick' stays for the
+-- `:Pick` command, for 'mini.extra' pickers (`<Leader>v*` in 'plugin/20_keymaps.lua')
+-- and for the few sources below that 'fzf-lua' has no direct equivalent for.
+
+-- local now = Config.now
+--
+-- now(function()
+-- 	require("mini.pick").setup()
+--
+-- 	-- stylua: ignore start
+-- 	local nmap_leader = function(suffix, rhs, desc)
+-- 		vim.keymap.set('n', '<Leader>' .. suffix, rhs, { desc = desc })
+-- 	end
+--
+-- 	nmap_leader('fA', '<Cmd>Pick git_hunks path="%" scope="staged"<CR>', 'Added hunks (buf)')
+-- 	nmap_leader('fM', '<Cmd>Pick git_hunks path="%"<CR>',                'Modified hunks (buf)')
+-- 	nmap_leader('fV', '<Cmd>Pick visit_paths<CR>',                       'Visit paths (cwd)')
+-- 	-- stylua: ignore end
+-- end)

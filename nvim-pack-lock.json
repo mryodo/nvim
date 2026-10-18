@@ -1,29 +1,443 @@
 {
   "plugins": {
+    "LuaSnip": {
+      "rev": "0abc8f390b278c3b4aabc4c004ac8a088b65cf24",
+      "src": "https://github.com/L3MON4D3/LuaSnip"
+    },
+    "apple-music.nvim": {
+      "rev": "164f8614f659dd2fb1c95010d951f7178e24c1de",
+      "src": "https://github.com/p5quared/apple-music.nvim"
+    },
+    "auto-dark-mode.nvim": {
+      "rev": "2b16a24c202892e61fca7df4d2d7c4c872a44165",
+      "src": "https://github.com/f-person/auto-dark-mode.nvim"
+    },
+    "ayugloom.nvim": {
+      "rev": "106b8509e158de6cd63ca9326de124d9da3a5e2a",
+      "src": "https://github.com/lucobellic/ayugloom.nvim"
+    },
+    "barbar.nvim": {
+      "rev": "337ecfadb8bf005050990bf2f624dc4fc828dabd",
+      "src": "https://github.com/romgrk/barbar.nvim"
+    },
+    "bento.nvim": {
+      "rev": "3a944910987f552b41fce22fbb7eed0bf0a6f1eb",
+      "src": "https://github.com/serhez/bento.nvim"
+    },
+    "blink-ripgrep.nvim": {
+      "rev": "af3f983853c4e6f231610687a1c3348ab60baa84",
+      "src": "https://github.com/mikavilpas/blink-ripgrep.nvim"
+    },
+    "blink.cmp": {
+      "rev": "8219b58f1c11a2fb1644d3c7116c509fa8348ec0",
+      "src": "https://github.com/saghen/blink.cmp"
+    },
+    "blink.compat": {
+      "rev": "1454f14a8d855a578ceeba77c62538fa1459a67c",
+      "src": "https://github.com/saghen/blink.compat"
+    },
+    "blink.lib": {
+      "rev": "fd9a48ebbe6ec30d5dfcc5b42c243941ccdca1aa",
+      "src": "https://github.com/saghen/blink.lib"
+    },
+    "bufferline.nvim": {
+      "rev": "655133c3b4c3e5e05ec549b9f8cc2894ac6f51b3",
+      "src": "https://github.com/akinsho/bufferline.nvim"
+    },
+    "cendre": {
+      "rev": "5c9d924a4c75c130a1c812ee3e240d78a92d2c3a",
+      "src": "https://github.com/Aejkatappaja/cendre"
+    },
+    "checkmate.nvim": {
+      "rev": "e57c8b502ab3e77e478e16460fcc2d2a16082f73",
+      "src": "https://github.com/bngarren/checkmate.nvim",
+      "version": "'main'"
+    },
+    "circadia": {
+      "rev": "85a6e75bfedf7560616174303fd50b1f1a34f881",
+      "src": "https://github.com/tanmaymanojgandhi/circadia"
+    },
+    "claudecode.nvim": {
+      "rev": "2390c6e45c4789072c293ac69de051d169668b29",
+      "src": "https://github.com/coder/claudecode.nvim"
+    },
     "conform.nvim": {
-      "rev": "c2526f1cde528a66e086ab1668e996d162c75f4f",
+      "rev": "016802de402556da54c36bd7359b441266b01cdd",
       "src": "https://github.com/stevearc/conform.nvim"
     },
+    "conjure": {
+      "rev": "b23c76a8c874fe7ac5ad95255efc66173b049088",
+      "src": "https://github.com/Olical/conjure"
+    },
+    "darklight.nvim": {
+      "rev": "5db97e2d132ebdf32c7e5edb5b0c68be9ae43038",
+      "src": "https://github.com/eliseshaffer/darklight.nvim"
+    },
+    "diffview.nvim": {
+      "rev": "4516612fe98ff56ae0415a259ff6361a89419b0a",
+      "src": "https://github.com/sindrets/diffview.nvim"
+    },
+    "dooing": {
+      "rev": "7ff620e11d023331403883280711e26d351809c6",
+      "src": "https://github.com/atiladefreitas/dooing"
+    },
+    "everforest": {
+      "rev": "28d59e29d972e21f2e802ce916f28dcab30697ae",
+      "src": "https://github.com/neanias/everforest"
+    },
+    "everforest-nvim": {
+      "rev": "a0e9edc57379e8feafc6ba207c26dbb12fc1b6d8",
+      "src": "https://github.com/neanias/everforest-nvim"
+    },
+    "fidget.nvim": {
+      "rev": "9e0201673e08e997e7cf52afca5565c70bd117f3",
+      "src": "https://github.com/j-hui/fidget.nvim"
+    },
+    "flume.nvim": {
+      "rev": "f3d6d14d86e159d76dd88cdbeba3662bdafde9b1",
+      "src": "https://github.com/mitander/flume.nvim"
+    },
     "friendly-snippets": {
-      "rev": "6cd7280adead7f586db6fccbd15d2cac7e2188b9",
+      "rev": "b4d01b0fdf3c9a549961c2f9ffe8dc09be166219",
       "src": "https://github.com/rafamadriz/friendly-snippets"
     },
+    "fzf-lua": {
+      "rev": "48d7c3db291a2c7c1825905c227a6bc81c83b837",
+      "src": "https://github.com/ibhagwan/fzf-lua"
+    },
+    "gitsigns.nvim": {
+      "rev": "851a051e2bd2caba97e23314c68d69f1b1cf5d19",
+      "src": "https://github.com/lewis6991/gitsigns.nvim"
+    },
+    "glimpse.nvim": {
+      "rev": "c6d1afda272e400d9f1948c352712f6d9ebd9cbd",
+      "src": "https://github.com/adriancmiranda/glimpse.nvim"
+    },
+    "gruvbox.nvim": {
+      "rev": "154eb5ff5b96d0641307113fa385eaf0d36d9796",
+      "src": "https://github.com/ellisonleao/gruvbox.nvim"
+    },
+    "image.nvim": {
+      "rev": "365e2ace0f619164ae6fd2f6f1d2807775dd6849",
+      "src": "https://github.com/3rd/image.nvim"
+    },
+    "inc-rename.nvim": {
+      "rev": "ddff8bd3eccedf043bd73f5bf89cf90d2d6d8105",
+      "src": "https://github.com/smjonas/inc-rename.nvim"
+    },
+    "incline.nvim": {
+      "rev": "debd628e9395f7a9da57bdc31ce75ca6b40a880b",
+      "src": "https://github.com/b0o/incline.nvim"
+    },
+    "indent-blankline.nvim": {
+      "rev": "f1e186e44d3b7f9ae918008e2c28ce37c6023d2d",
+      "src": "https://github.com/lukas-reineke/indent-blankline.nvim"
+    },
+    "jb.nvim": {
+      "rev": "92a263ce54828ec248b9cf2fa4e97e27e0e9a608",
+      "src": "https://github.com/nickkadutskyi/jb.nvim"
+    },
+    "jet.nvim": {
+      "rev": "505c7e578d96dec40df33f57c1e3c33d51c30973",
+      "src": "https://github.com/wurli/jet.nvim"
+    },
+    "jupynvim": {
+      "rev": "219b01c790ac0ec72b35230e3c4ca3faf4a78877",
+      "src": "https://github.com/sheng-tse/jupynvim",
+      "version": ">=0.0.0"
+    },
+    "kanagawa-paper.nvim": {
+      "rev": "ecf19801a2673054c19421d82b766f7641688320",
+      "src": "https://github.com/thesimonho/kanagawa-paper.nvim"
+    },
+    "kanso.nvim": {
+      "rev": "1afbbb449aa0254823dbe1932e3cbb51886ff9fe",
+      "src": "https://github.com/webhooked/kanso.nvim"
+    },
+    "koda.nvim": {
+      "rev": "25a5c98ca2f6bb0b69f5e2654a78f0d7c7e0721d",
+      "src": "https://github.com/oskarnurm/koda.nvim"
+    },
+    "lackluster.nvim": {
+      "rev": "70dd682e564784893b984deb51dd5ddd263c8cc7",
+      "src": "https://github.com/slugbyte/lackluster.nvim"
+    },
+    "lazydev.nvim": {
+      "rev": "ff2cbcba459b637ec3fd165a2be59b7bbaeedf0d",
+      "src": "https://github.com/folke/lazydev.nvim"
+    },
+    "lazygit.nvim": {
+      "rev": "7bbf1aefd9a5db774319d70156cfff8e78f4f3ed",
+      "src": "https://github.com/103sbavert/lazygit.nvim"
+    },
+    "lorem-gypsum.nvim": {
+      "rev": "3f0e6da0334d236770a791c1502e263408da10aa",
+      "src": "https://github.com/MartyBeGood/lorem-gypsum.nvim"
+    },
+    "lspkind.nvim": {
+      "rev": "c7274c48137396526b59d86232eabcdc7fed8a32",
+      "src": "https://github.com/onsails/lspkind.nvim"
+    },
+    "lualine-lsp-progress": {
+      "rev": "56842d097245a08d77912edf5f2a69ba29f275d7",
+      "src": "https://github.com/arkav/lualine-lsp-progress"
+    },
+    "lualine.nvim": {
+      "rev": "221ce6b2d999187044529f49da6554a92f740a96",
+      "src": "https://github.com/nvim-lualine/lualine.nvim"
+    },
+    "luna.nvim": {
+      "rev": "727c19334528e1b8939f518d1ea43c4e62d98f91",
+      "src": "https://github.com/WTFox/luna.nvim"
+    },
+    "lush.nvim": {
+      "rev": "9c60ec2279d62487d942ce095e49006af28eed6e",
+      "src": "https://github.com/rktjmp/lush.nvim"
+    },
+    "markview.nvim": {
+      "rev": "49d2cf7ced872db74083a144ded1f94fe224d09a",
+      "src": "https://github.com/OXY2DEV/markview.nvim"
+    },
+    "mason-lspconfig.nvim": {
+      "rev": "e17625cdc8c2650787467398e02c5d63a2cde966",
+      "src": "https://github.com/mason-org/mason-lspconfig.nvim"
+    },
+    "mason.nvim": {
+      "rev": "2a6940af80375532e5e9e7c1f2fc6319a1b7a69d",
+      "src": "https://github.com/mason-org/mason.nvim"
+    },
+    "mdx.nvim": {
+      "rev": "6c3dc7c4a4b58b5d86404c21a9b4655282ca08c5",
+      "src": "https://github.com/davidmh/mdx.nvim"
+    },
     "mini.nvim": {
-      "rev": "4e61631464a12138bc0c82ea216b1d0d3cc2b315",
+      "rev": "9ee72c26ac1440ee6c95ce708c1d739684be316a",
       "src": "https://github.com/nvim-mini/mini.nvim"
     },
+    "mini.statuscolumn": {
+      "rev": "1ef647472b8d635071cee2cee26bf809cf3d3965",
+      "src": "https://github.com/nvim-mini/mini.statuscolumn"
+    },
+    "neovim-ayu": {
+      "rev": "e5a9f0fa2918d6b5f57c21b3ac014314ee5e41c8",
+      "src": "https://github.com/Shatur/neovim-ayu"
+    },
+    "notifications.nvim": {
+      "rev": "e46ff0ac53310e20667dcfd20cb8b56398010be0",
+      "src": "https://github.com/nickkadutskyi/notifications.nvim"
+    },
+    "nvim": {
+      "rev": "edefef779ab08ce1a4a404713e3012b0d202bd35",
+      "src": "https://github.com/catppuccin/nvim"
+    },
+    "nvim-autopairs": {
+      "rev": "3172f40c16563db871a58f20d205c710ad782311",
+      "src": "https://github.com/windwp/nvim-autopairs"
+    },
+    "nvim-hlslens": {
+      "rev": "be2d7b2be01860b5445a007ff2bc72b29896db6b",
+      "src": "https://github.com/kevinhwang91/nvim-hlslens"
+    },
+    "nvim-jupyter": {
+      "rev": "f09b399b65ab77ee6dc8a4a01c193f9ccfa51932",
+      "src": "https://github.com/abdelwahab-7/nvim-jupyter"
+    },
+    "nvim-lint": {
+      "rev": "f6230a5c06ba59e6059c14637f1dbe29a7978b9b",
+      "src": "https://github.com/mfussenegger/nvim-lint"
+    },
     "nvim-lspconfig": {
-      "rev": "f4e9d367d4e067d7a5fabc9fd3f1349b291eb718",
+      "rev": "6d27c288ff951e1e94cb5f91c800adeddf0dc0c2",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
+    "nvim-navic": {
+      "rev": "455808fd0fae06e6d70fadfd61432275db8f34ce",
+      "src": "https://github.com/SmiteshP/nvim-navic"
+    },
+    "nvim-nio": {
+      "rev": "edcc181a875301dd21840189aa2f2f9ad69fc172",
+      "src": "https://github.com/nvim-neotest/nvim-nio"
+    },
+    "nvim-scrollbar": {
+      "rev": "f8e87b96cd6362ef8579be456afee3b38fd7e2a8",
+      "src": "https://github.com/petertriho/nvim-scrollbar"
+    },
+    "nvim-smuggler": {
+      "rev": "92110b4840b4841f020ebd20cdd889624a56373d",
+      "src": "https://github.com/klafyvel/nvim-smuggler"
+    },
     "nvim-treesitter": {
-      "rev": "9f2dad22ef8bb14fd1e0a3aa8859cdc88170668b",
+      "rev": "1a4f47b03dfe92d28de7d5654c67327ef008c9e6",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter"
     },
+    "nvim-treesitter-context": {
+      "rev": "8decd73460d26ef0a0befb745d022dd1fc2c38b8",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter-context"
+    },
     "nvim-treesitter-textobjects": {
-      "rev": "a0e182ae21fda68c59d1f36c9ed45600aef50311",
-      "src": "https://github.com/nvim-treesitter/nvim-treesitter-textobjects",
-      "version": "'main'"
+      "rev": "5c7b0263797dfd1bd6202f2b219f3b53a80b2187",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter-textobjects"
+    },
+    "nvim-ts-autotag": {
+      "rev": "d7220b55e16ed3c04e88086256def5d282429493",
+      "src": "https://github.com/windwp/nvim-ts-autotag"
+    },
+    "nvim-web-devicons": {
+      "rev": "58447c1fca354bbf184425e4a8d01deecbd6f3c4",
+      "src": "https://github.com/nvim-tree/nvim-web-devicons"
+    },
+    "opencode.nvim": {
+      "rev": "84eabfbe65a44f452ee302fe360cea9fd9939f31",
+      "src": "https://github.com/nickjvandyke/opencode.nvim",
+      "version": ">=0.0.0"
+    },
+    "otter.nvim": {
+      "rev": "0b38ccef44a805e8b378f5f6ce38aad0642c9366",
+      "src": "https://github.com/jmbuhr/otter.nvim"
+    },
+    "oxocarbon.nvim": {
+      "rev": "cd6523a0836d6e8ee823d343149fd06c7b71fdde",
+      "src": "https://github.com/nyoom-engineering/oxocarbon.nvim"
+    },
+    "pdftui": {
+      "rev": "285d13a75e02257b185b2f7528e26b6fa46984a9",
+      "src": "https://github.com/tofunori/pdftui"
+    },
+    "plenary.nvim": {
+      "rev": "74b06c6c75e4eeb3108ec01852001636d85a932b",
+      "src": "https://github.com/nvim-lua/plenary.nvim"
+    },
+    "present.nvim": {
+      "rev": "b725cdf8e10e55ac2e956964f720a319a9d4a62e",
+      "src": "https://github.com/kunkka19xx/present.nvim"
+    },
+    "pyrepl.nvim": {
+      "rev": "8e7d4fc0a97b421a6ede49f4b2ea35114690deb2",
+      "src": "https://github.com/dangooddd/pyrepl.nvim"
+    },
+    "pyrola.nvim": {
+      "rev": "95ab0bf5ad1f65a7c23966d705caa3dfc0a80151",
+      "src": "https://github.com/matarina/pyrola.nvim"
+    },
+    "quarto-nvim": {
+      "rev": "17f1e5d664bc615478230dc0240666329efacf9b",
+      "src": "https://github.com/quarto-dev/quarto-nvim"
+    },
+    "render-latex.nvim": {
+      "rev": "c5a546bfc9511e3197461e310e9f248e3c8a2d36",
+      "src": "https://github.com/techwizrd/render-latex.nvim"
+    },
+    "render-markdown.nvim": {
+      "rev": "8e8795368391036643b622875a6da6a51bcd33f4",
+      "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
+    },
+    "rwth": {
+      "rev": "25a5c98ca2f6bb0b69f5e2654a78f0d7c7e0721d",
+      "src": "git@github.com:oskarnurm/koda.nvim.git"
+    },
+    "rwth.nvim": {
+      "rev": "55244f158daecdecd1498226bcd511a2568f06e8",
+      "src": "https://github.com/mryodo/rwth.nvim"
+    },
+    "sanzo.nvim": {
+      "rev": "7c157944d1151e692d7eb2eb5ee07c7ef8ff8544",
+      "src": "https://codeberg.org/navahas/sanzo.nvim"
+    },
+    "satellite.nvim": {
+      "rev": "87843c9c8f28b54332497302de380a6d94c9e82b",
+      "src": "https://github.com/lewis6991/satellite.nvim"
+    },
+    "slimline.nvim": {
+      "rev": "6c91c731863f47636c6ae0f00774ea6c2c90cb4b",
+      "src": "https://github.com/sschleemilch/slimline.nvim"
+    },
+    "smart-enter.nvim": {
+      "rev": "175054b19b8f79d9a631e0dcce4b08821b8c88c3",
+      "src": "https://github.com/Chiarandini/smart-enter.nvim"
+    },
+    "snacks.nvim": {
+      "rev": "51c66de000d5b4b8a92cf545d8b07c688b129989",
+      "src": "https://github.com/nickkadutskyi/snacks.nvim"
+    },
+    "snapshot.nvim": {
+      "rev": "924d25a97fa9127a3f31606d2508403a7cfac5bf",
+      "src": "https://github.com/smit4k/snapshot.nvim"
+    },
+    "switch.vim": {
+      "rev": "a824d660dc97db9798be1b7103b1114b6c3da13d",
+      "src": "https://github.com/AndrewRadev/switch.vim"
+    },
+    "techbase.nvim": {
+      "rev": "d5a512548fe37d3c7624ab1d5f7df7326ff6965b",
+      "src": "https://github.com/mcauley-penney/techbase.nvim"
+    },
+    "telescope-fzf-native.nvim": {
+      "rev": "b25b749b9db64d375d782094e2b9dce53ad53a40",
+      "src": "https://github.com/nvim-telescope/telescope-fzf-native.nvim"
+    },
+    "telescope-media-files.nvim": {
+      "rev": "0826c7a730bc4d36068f7c85cf4c5b3fd9fb570a",
+      "src": "https://github.com/nvim-telescope/telescope-media-files.nvim"
+    },
+    "telescope.nvim": {
+      "rev": "40aedd8a68c78a656a10a8d62d80c54af59420fb",
+      "src": "https://github.com/nvim-telescope/telescope.nvim"
+    },
+    "thorn.nvim": {
+      "rev": "e7074d253db38d76c5b709ac29f22c5e508da9d3",
+      "src": "https://github.com/jpwol/thorn.nvim"
+    },
+    "tiny-inline-diagnostic.nvim": {
+      "rev": "46ae9b3c8f3039e96ff4497d190ad0aee091f30d",
+      "src": "https://github.com/rachartier/tiny-inline-diagnostic.nvim"
+    },
+    "todo-comments.nvim": {
+      "rev": "31e3c38ce9b29781e4422fc0322eb0a21f4e8668",
+      "src": "https://github.com/folke/todo-comments.nvim"
+    },
+    "toggleterm.nvim": {
+      "rev": "9a88eae817ef395952e08650b3283726786fb5fb",
+      "src": "https://github.com/akinsho/toggleterm.nvim"
+    },
+    "token": {
+      "rev": "3454326ab2c1a025e157e559ef8c6e3e2be01ef2",
+      "src": "https://github.com/ThorstenRhau/token"
+    },
+    "treesj": {
+      "rev": "9f349ba62c524f065d6f43254d731ddf8319b9bf",
+      "src": "https://github.com/Wansmer/treesj"
+    },
+    "trouble.nvim": {
+      "rev": "bd67efe408d4816e25e8491cc5ad4088e708a69a",
+      "src": "https://github.com/folke/trouble.nvim"
+    },
+    "vague.nvim": {
+      "rev": "73f8aaa866bf3d14dd0b0ab9e48c11794c1cb7ab",
+      "src": "https://github.com/vague-theme/vague.nvim"
+    },
+    "vim-julia-cell": {
+      "rev": "f15961441cb55934fb0d6b15004b48e72decf720",
+      "src": "https://github.com/mroavi/vim-julia-cell"
+    },
+    "vim-slime": {
+      "rev": "3c01cab0e65c6c1e7486683aa1bfc4c627ed6fae",
+      "src": "https://github.com/goerz/vim-slime"
+    },
+    "vimtex": {
+      "rev": "f029f22b418530788704bec2397b880da136b31c",
+      "src": "https://github.com/lervag/vimtex"
+    },
+    "virt-column.nvim": {
+      "rev": "b87e3e0864211a32724a2ebf3be37e24e9e2fa99",
+      "src": "https://github.com/lukas-reineke/virt-column.nvim"
+    },
+    "which-key.nvim": {
+      "rev": "3aab2147e74890957785941f0c1ad87d0a44c15a",
+      "src": "https://github.com/folke/which-key.nvim"
+    },
+    "zen.nvim": {
+      "rev": "e552fc12f847113a05589981d02f69c953d6d3e9",
+      "src": "https://github.com/nendix/zen.nvim"
     }
   }
 }
