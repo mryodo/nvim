@@ -192,7 +192,7 @@ later(function()
 	-- `load_theme` uses `dofile`, so re-reading it picks up the light/dark palette.
 	local mode_colors = {}
 	local theme_mode = {
-		n = "normal", i = "insert", v = "visual", V = "visual", ["\22"] = "visual",
+		i = "insert", v = "visual", V = "visual", ["\22"] = "visual",
 		s = "visual", S = "visual", ["\19"] = "visual", c = "command", ["!"] = "command",
 		R = "replace", r = "replace", t = "terminal",
 	}
@@ -202,6 +202,8 @@ later(function()
 		for key, name in pairs(theme_mode) do
 			mode_colors[key] = theme[name].a
 		end
+		-- Normal mode is the quiet state: no block, just dim text.
+		mode_colors.n = { fg = theme.inactive.c.fg }
 		pcall(function()
 			require("lualine").refresh()
 		end)
@@ -213,19 +215,22 @@ later(function()
 		return mode_colors[(vim.fn.mode(1) or "n"):sub(1, 1)] or mode_colors.n
 	end
 
-	--- Filled block: the theme's mode section colours.
+	--- Filled block: the theme's mode section colours (unfilled in Normal mode).
 	local function primary()
 		local a = mode_a()
-		return { bg = a.bg, fg = a.fg }
+		return a.bg and { bg = a.bg, fg = a.fg } or { fg = a.fg }
 	end
 
 	--- Unfilled: the mode colour as a foreground.
 	local function secondary()
-		return { fg = mode_a().bg }
+		local a = mode_a()
+		return { fg = a.bg or a.fg }
 	end
 
+	--- Divider between groups. Invisible in Normal mode so the quiet state stays
+	--- quiet, a bar as soon as anything is happening.
 	local function divider()
-		return "┃"
+		return mode_a().bg and "┃" or " "
 	end
 
 	-- The same glyphs 'incline' puts in its badges ('plugin/93_ui.lua')
