@@ -33,7 +33,7 @@ later(function()
 			},
 		},
 	})
-	add({ { src = "https://github.com/bngarren/checkmate.nvim", version = "main" } })
+	add({ { src = "https://github.com/mryodo/checkmate.nvim", version = "mryodo" } })
 	require("checkmate").setup({
 		metadata = {
 			due = {

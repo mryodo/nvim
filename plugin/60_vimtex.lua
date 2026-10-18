@@ -10,7 +10,7 @@ local now_if_args = #vim.api.nvim_list_uis() == 0 and Config.now or Config.now_i
 -- this is deferred, and the next event-loop tick is still long before any
 -- `:edit` can open a `tex` buffer.
 now_if_args(function()
-	add({ "https://github.com/tofunori/pdftui" })
+	add({ { src = "https://github.com/mryodo/pdftui", version = "mryodo" } })
 	require("pdftui").setup({
 		pdf_path = nil, -- auto-detected from .tex file
 		split = true, -- false = open in new tab, true = split

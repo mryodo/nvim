@@ -49,9 +49,9 @@
       "src": "https://github.com/Aejkatappaja/cendre"
     },
     "checkmate.nvim": {
-      "rev": "e57c8b502ab3e77e478e16460fcc2d2a16082f73",
-      "src": "https://github.com/bngarren/checkmate.nvim",
-      "version": "'main'"
+      "rev": "e173f55f23b4dd69c8d41f4aa46bfabc7910dfc1",
+      "src": "https://github.com/mryodo/checkmate.nvim",
+      "version": "'mryodo'"
     },
     "circadia": {
       "rev": "85a6e75bfedf7560616174303fd50b1f1a34f881",
@@ -300,8 +300,9 @@
       "src": "https://github.com/nyoom-engineering/oxocarbon.nvim"
     },
     "pdftui": {
-      "rev": "285d13a75e02257b185b2f7528e26b6fa46984a9",
-      "src": "https://github.com/tofunori/pdftui"
+      "rev": "ea48830734ceeb1fea3e380cd5578bf61d098646",
+      "src": "https://github.com/mryodo/pdftui",
+      "version": "'mryodo'"
     },
     "plenary.nvim": {
       "rev": "74b06c6c75e4eeb3108ec01852001636d85a932b",
