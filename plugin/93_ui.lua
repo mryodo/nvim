@@ -211,12 +211,43 @@ now(function()
 		end
 	end
 
+	-- Ghostty has no remote-control socket, so the `theme = ` line in its config
+	-- is rewritten (`~/.config/ghostty/themes/<scheme>.conf` must exist) and
+	-- every window is repainted by asking it to reload through AppleScript.
+	local function sync_ghostty(scheme)
+		if vim.env.TERM_PROGRAM ~= "ghostty" then
+			return
+		end
+
+		local conf_dir = vim.fs.joinpath(vim.env.HOME, ".config", "ghostty")
+		if vim.fn.filereadable(vim.fs.joinpath(conf_dir, "themes", scheme .. ".conf")) == 0 then
+			return
+		end
+		local ghostty_conf = vim.fs.joinpath(conf_dir, "config")
+		local ok, lines = pcall(vim.fn.readfile, ghostty_conf)
+		if not ok then
+			return
+		end
+		for i, line in ipairs(lines) do
+			if line:match("^theme%s*=") then
+				lines[i] = "theme = " .. scheme .. ".conf"
+			end
+		end
+		vim.fn.writefile(lines, ghostty_conf)
+		vim.system({
+			"osascript",
+			"-e",
+			'tell application "Ghostty" to perform action "reload_config" on terminal 1 of window 1',
+		}, { detach = true })
+	end
+
 	local toggle_background = function()
 		vim.o.background = vim.o.background == "dark" and "light" or "dark"
 		local scheme = background_schemes[vim.o.background]
 		vim.cmd("colorscheme " .. scheme)
 		write_background(vim.o.background)
 		sync_kitty(scheme)
+		sync_ghostty(scheme)
 	end
 	vim.keymap.set("n", "\\b", toggle_background, { desc = "Toggle background" })
 
