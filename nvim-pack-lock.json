@@ -25,11 +25,11 @@
       "src": "https://github.com/serhez/bento.nvim"
     },
     "blink-ripgrep.nvim": {
-      "rev": "01e5d9b492ba2a9726029909664cea65e37f1033",
+      "rev": "044ce204e70d348331b1f783ec86b4fa09a9416f",
       "src": "https://github.com/mikavilpas/blink-ripgrep.nvim"
     },
     "blink.cmp": {
-      "rev": "b72ed05dd452690181837d484984144a64709f17",
+      "rev": "788f589ae03172a8cdea912a8c448315219dc874",
       "src": "https://github.com/saghen/blink.cmp"
     },
     "blink.compat": {
@@ -58,7 +58,7 @@
       "src": "https://github.com/tanmaymanojgandhi/circadia"
     },
     "claudecode.nvim": {
-      "rev": "2390c6e45c4789072c293ac69de051d169668b29",
+      "rev": "c0deb41a0c6ac74c620be0a683aa9834e535c84a",
       "src": "https://github.com/coder/claudecode.nvim"
     },
     "conform.nvim": {
@@ -94,7 +94,7 @@
       "src": "https://github.com/j-hui/fidget.nvim"
     },
     "flume.nvim": {
-      "rev": "32d8582ba183064e14681b7758fa8ad2ddfa1899",
+      "rev": "285fdd126e387006faab5a5d845e5a1fb083e955",
       "src": "https://github.com/mitander/flume.nvim"
     },
     "friendly-snippets": {
@@ -102,11 +102,11 @@
       "src": "https://github.com/rafamadriz/friendly-snippets"
     },
     "fzf-lua": {
-      "rev": "348df165f1773dd08c5d710add3fd0db6d421e6a",
+      "rev": "5b88d6f0af7fcb41d4a8bb340bf70d7e3824ee9d",
       "src": "https://github.com/ibhagwan/fzf-lua"
     },
     "gitsigns.nvim": {
-      "rev": "fd780920613e541cbdfac41bf711583ed49f9249",
+      "rev": "d4854fa9a94b5c8b37dd209fb4a19e98e764186f",
       "src": "https://github.com/lewis6991/gitsigns.nvim"
     },
     "glimpse.nvim": {
@@ -199,19 +199,23 @@
       "src": "https://github.com/OXY2DEV/markview.nvim"
     },
     "mason-lspconfig.nvim": {
-      "rev": "00b5473cca4db5b410ff4bae724e3b6e21f2687f",
+      "rev": "a338f44149f5673882c32629697d67b0c0547aec",
       "src": "https://github.com/mason-org/mason-lspconfig.nvim"
     },
     "mason.nvim": {
       "rev": "2a6940af80375532e5e9e7c1f2fc6319a1b7a69d",
       "src": "https://github.com/mason-org/mason.nvim"
     },
+    "md-pdf.nvim": {
+      "rev": "d0bab77b6965dcd272c3221e6d42d30194d341e2",
+      "src": "https://github.com/arminveres/md-pdf.nvim"
+    },
     "mdx.nvim": {
       "rev": "6c3dc7c4a4b58b5d86404c21a9b4655282ca08c5",
       "src": "https://github.com/davidmh/mdx.nvim"
     },
     "mini.nvim": {
-      "rev": "e4e61006afcf6b399924e64b43c1168fca7b4301",
+      "rev": "ed8683521996657ce774e5eec9d2f9b1b5ecef82",
       "src": "https://github.com/nvim-mini/mini.nvim"
     },
     "mini.statuscolumn": {
@@ -225,6 +229,10 @@
     "notifications.nvim": {
       "rev": "e46ff0ac53310e20667dcfd20cb8b56398010be0",
       "src": "https://github.com/nickkadutskyi/notifications.nvim"
+    },
+    "nui.nvim": {
+      "rev": "10fc361835c856ba4233ef5ea135b919bf3dce97",
+      "src": "https://github.com/MunifTanjim/nui.nvim"
     },
     "nvim": {
       "rev": "edefef779ab08ce1a4a404713e3012b0d202bd35",
@@ -247,7 +255,7 @@
       "src": "https://github.com/mfussenegger/nvim-lint"
     },
     "nvim-lspconfig": {
-      "rev": "45a3a444b710511c39abca3b60bb6e23a21e3de5",
+      "rev": "77b7432d4770d23b277d37923e5a08a442d8bb07",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "nvim-navic": {
@@ -267,7 +275,7 @@
       "src": "https://github.com/klafyvel/nvim-smuggler"
     },
     "nvim-treesitter": {
-      "rev": "29212d826054bb2948fa9d3a99eca9bf6a050eb2",
+      "rev": "a2f694478be07f89c2d03cc17858a8745a400c4b",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter"
     },
     "nvim-treesitter-context": {
@@ -364,6 +372,10 @@
       "rev": "924d25a97fa9127a3f31606d2508403a7cfac5bf",
       "src": "https://github.com/smit4k/snapshot.nvim"
     },
+    "swift.nvim": {
+      "rev": "865602bb82c246c41af21cb8746d5587f244c194",
+      "src": "https://github.com/devswiftzone/swift.nvim"
+    },
     "switch.vim": {
       "rev": "70ad8c66c694c60e9d13342493f51d5b7dddc42d",
       "src": "https://github.com/AndrewRadev/switch.vim"
@@ -425,7 +437,7 @@
       "src": "https://github.com/goerz/vim-slime"
     },
     "vimtex": {
-      "rev": "79a5fb444147f94a5284b6800030e17eecd18a06",
+      "rev": "02eee260766d031185449c9600f03b933fa0357c",
       "src": "https://github.com/lervag/vimtex"
     },
     "virt-column.nvim": {
@@ -435,6 +447,10 @@
     "which-key.nvim": {
       "rev": "3aab2147e74890957785941f0c1ad87d0a44c15a",
       "src": "https://github.com/folke/which-key.nvim"
+    },
+    "xcodebuild.nvim": {
+      "rev": "45cd4a8daabcc1c4716388fadc036e06732756bd",
+      "src": "https://github.com/wojciech-kulik/xcodebuild.nvim"
     },
     "zen-mode.nvim": {
       "rev": "8564ce6d29ec7554eb9df578efa882d33b3c23a7",

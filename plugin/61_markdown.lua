@@ -7,6 +7,16 @@ now_if_args(function()
 end)
 
 later(function()
+	add({ "https://github.com/arminveres/md-pdf.nvim" })
+	require("md-pdf").setup({
+		toc = false,
+		margins = "2.5cm",
+		fonts = {
+			main_font = "Libron-Regular",
+			sans_font = "Libron-Regular",
+		},
+		pdf_engine = "lualatex",
+	})
 	add({
 		"https://github.com/OXY2DEV/markview.nvim",
 	})
@@ -136,4 +146,9 @@ later(function()
 	vim.api.nvim_create_user_command("Sync", function()
 		vim.fn.system("sh ~/scripts/simple.sh")
 	end, { desc = "Run ~/scripts/simple.sh" })
+end)
+
+Config.now(function()
+	vim.opt.rtp:prepend(vim.fn.expand("~/threader"))
+	require("threader").setup()
 end)

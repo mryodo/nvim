@@ -107,7 +107,7 @@ now(function()
 	-- `build` hook nothing produces it, so rebuild on install/update the same way
 	-- 'plugin/40_lsp.lua' hooks `:TSUpdate`.
 	local build_blink = function()
-		require("blink.cmp").build()
+		require("blink.cmp").build():pwait()
 	end
 	Config.on_packchanged("blink.cmp", { "install", "update" }, build_blink, "Build blink.cmp matcher")
 

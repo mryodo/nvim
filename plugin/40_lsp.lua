@@ -165,6 +165,7 @@ now_if_args(function()
 		"lua_ls", -- configured in 'after/lsp/lua_ls.lua'
 		"marksman",
 		"mdx_analyzer",
+		"sourcekit",
 		"taplo",
 		"tsserver",
 		"yamlls",
