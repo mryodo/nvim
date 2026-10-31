@@ -320,10 +320,6 @@
       "rev": "b725cdf8e10e55ac2e956964f720a319a9d4a62e",
       "src": "https://github.com/kunkka19xx/present.nvim"
     },
-    "pyrepl.nvim": {
-      "rev": "8e7d4fc0a97b421a6ede49f4b2ea35114690deb2",
-      "src": "https://github.com/dangooddd/pyrepl.nvim"
-    },
     "pyrola.nvim": {
       "rev": "95ab0bf5ad1f65a7c23966d705caa3dfc0a80151",
       "src": "https://github.com/matarina/pyrola.nvim"
