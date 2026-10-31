@@ -17,6 +17,8 @@ now(function()
 	-- Must come after `mini.basics`: it appends window-border pieces to
 	-- 'fillchars' unconditionally, so this is the last word on the option.
 	vim.o.fillchars = "eob: ,diff:━"
+	-- `\l` (toggle 'list') shadows typst's `\ll`/`\lp`/`\lw`/`\lh` after 'timeoutlen'.
+	vim.keymap.del("n", "\\l")
 end)
 
 now(function()
@@ -190,8 +192,13 @@ end)
 later(function()
 	require("mini.surround").setup({
 		custom_surroundings = {
+			m = {
+				input = { "\\%(().-()\\%)" },
+				output = { left = "\\(", right = "\\)" },
+			},
 			e = {
-				input = { "\\begin%{[^}]*%}", "\\end%{[^}]*%}" },
+				-- ponytail: `.-` stops at the first `\end`, so nested envs of the same depth confuse it
+				input = { "\\begin%b{}%s*().-()%s*\\end%b{}" },
 				output = function()
 					local env = MiniInput.get({ prompt = "Environment: ", scope = "cursor" })
 					if env == "" then
@@ -207,7 +214,7 @@ later(function()
 				end,
 			},
 			f = {
-				input = { "\\%a+{", "}" },
+				input = { "\\%a+%b{}", "^\\%a+{().*()}$" },
 				output = function()
 					local fn = MiniInput.get({ prompt = "Command: ", scope = "cursor" })
 					if fn == "" then

@@ -167,6 +167,7 @@ now_if_args(function()
 		"mdx_analyzer",
 		"sourcekit",
 		"taplo",
+		"tinymist",
 		"tsserver",
 		"yamlls",
 	})

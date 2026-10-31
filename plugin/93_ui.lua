@@ -49,20 +49,6 @@ later(function()
 	local circadia = vim.pack.get({ "circadia" })[1]
 	vim.opt.rtp:prepend(vim.fs.joinpath(circadia.path, "ports", "neovim"))
 
-	add({ "https://github.com/neanias/everforest-nvim" })
-	require("everforest").setup({
-		background = "hard",
-		transparent_background_level = 0,
-		sign_column_background = "none",
-		ui_contrast = "low",
-		diagnostic_text_highlight = false,
-		diagnostic_virtual_text = "coloured",
-		diagnostic_line_highlight = true,
-		spell_foreground = false,
-		show_eob = true,
-		float_style = "bright",
-		inlay_hints_background = "none",
-	})
 end)
 
 -- File icons =================================================================
@@ -135,7 +121,7 @@ now(function()
 		},
 	})
 
-	-- Active scheme: 'ayugloom' (dark) / 'sw1comm' (light).
+	-- Active scheme: 'minischeme2-dark' / 'minischeme2-light'.
 	-- `\b` still toggles 'background' and syncs Kitty.
 	--
 	-- 'jb.nvim' stays installed: `jb.icons` and `jb.borders` are used across
@@ -151,6 +137,23 @@ now(function()
 	vim.pack.add({
 		"https://codeberg.org/navahas/sanzo.nvim",
 	})
+	-- 'colors/everforest-{dark,light}.lua' wrap it, so the names match the
+	-- Kitty/Ghostty theme files and threader's themes.
+	add({ "https://github.com/neanias/everforest-nvim" })
+	require("everforest").setup({
+		background = "medium",
+		transparent_background_level = 0,
+		sign_column_background = "none",
+		ui_contrast = "low",
+		diagnostic_text_highlight = false,
+		diagnostic_virtual_text = "coloured",
+		diagnostic_line_highlight = true,
+		spell_foreground = false,
+		show_eob = true,
+		float_style = "bright",
+		inlay_hints_background = "none",
+	})
+
 	add({ "https://github.com/oskarnurm/koda.nvim" })
 	require("koda").setup({ theme = { dark = "dark", light = "glade" } })
 
@@ -159,9 +162,11 @@ now(function()
 	-- local background_schemes = { light = "ayugloom", dark = "ayugloom" }
 	-- local background_schemes = { light = "koda-dark", dark = "koda-dark" }
 	-- local background_schemes = { light = "sw1comm", dark = "koda-dark" }
-	local background_schemes = { light = "sw1comm", dark = "ayugloom" }
+	-- local background_schemes = { light = "sw1comm", dark = "ayugloom" }
+	-- local background_schemes = { light = "everforest-light", dark = "everforest-dark" }
 	-- local background_schemes = { light = "rwth-light", dark = "rwth-dark" }
 	-- local background_schemes = { light = "circadia-light", dark = "circadia-dark" }
+	local background_schemes = { light = "minischeme2-light", dark = "minischeme2-dark" }
 
 	-- Persisted across sessions so a new `nvim` starts in whatever 'background'
 	-- the last `\b` left behind, whether that happened in this terminal or
