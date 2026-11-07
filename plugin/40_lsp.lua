@@ -198,6 +198,9 @@ end)
 
 -- Diagnostics display ========================================================
 later(function()
+	-- Faint parameter/type hints inline, for every server that offers them
+	vim.lsp.inlay_hint.enable(true)
+
 	add({ "https://github.com/rachartier/tiny-inline-diagnostic.nvim" })
 	require("tiny-inline-diagnostic").setup({
 		options = {

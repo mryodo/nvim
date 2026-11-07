@@ -232,10 +232,10 @@ now(function()
 				-- move through the list, so <CR> is only needed to commit.
 				selection = { preselect = true, auto_insert = true },
 			},
-			-- 'test-nvim' never pops the documentation window open by itself; it
-			-- is reachable with <C-space> on an already-selected item.
+			-- Opens after a pause on an item; <C-space> toggles it as well.
 			documentation = {
-				auto_show = false,
+				auto_show = true,
+				auto_show_delay_ms = 400,
 				window = { border = "rounded" },
 			},
 			menu = {

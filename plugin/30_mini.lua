@@ -16,7 +16,7 @@ now(function()
 
 	-- Must come after `mini.basics`: it appends window-border pieces to
 	-- 'fillchars' unconditionally, so this is the last word on the option.
-	vim.o.fillchars = "eob: ,diff:━"
+	vim.o.fillchars = "eob: ,diff:━,vert:│,horiz:─,horizup:┴,horizdown:┬,vertleft:┤,vertright:├,verthoriz:┼"
 	-- `\l` (toggle 'list') shadows typst's `\ll`/`\lp`/`\lw`/`\lh` after 'timeoutlen'.
 	vim.keymap.del("n", "\\l")
 end)
@@ -29,8 +29,8 @@ now(function()
 			return not (ext3_blocklist[ext:sub(-3)] or ext4_blocklist[ext:sub(-4)])
 		end,
 	})
-	-- Right away, not in `later()`: 'bufferline.nvim' draws its first frame with
-	-- whatever `require("nvim-web-devicons")` returns.
+	-- Right away, not in `later()`, so plugins asking `nvim-web-devicons` for
+	-- icons during startup already get 'mini.icons'.
 	MiniIcons.mock_nvim_web_devicons()
 	later(MiniIcons.tweak_lsp_kind)
 end)
@@ -106,6 +106,18 @@ later(function()
 	require("mini.git").setup()
 end)
 
+
+later(function()
+	-- Scroll only, and short: anything longer makes the editor feel slower
+	local animate = require("mini.animate")
+	animate.setup({
+		cursor = { enable = false },
+		resize = { enable = false },
+		open = { enable = false },
+		close = { enable = false },
+		scroll = { timing = animate.gen_timing.linear({ duration = 80, unit = "total" }) },
+	})
+end)
 
 later(function()
 	require("mini.keymap").setup()

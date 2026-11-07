@@ -3,9 +3,8 @@
 -- └────────────────┘
 --
 -- 'bento.nvim' is a floating buffer switcher: press the expand key, then the
--- one-character label of the buffer you want. It is not the buffer *line* --
--- 'bufferline.nvim' ('plugin/93_ui.lua') still owns 'tabline', which is why
--- `ui.mode` is left on its `"floating"` default.
+-- one-character label of the buffer you want. `ui.mode` is left on its
+-- `"floating"` default: there is no buffer line, and 'tabline' is unused.
 --
 -- Everything below the `setup()` call is required for the plugin to appear at
 -- all. v1 registered a `;` mapping and a full set of actions during `setup()`;

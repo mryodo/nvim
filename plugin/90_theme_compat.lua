@@ -45,7 +45,7 @@ local links = {
   -- Breadcrumbs ('plugin/92_statusline.lua') --------------------------------
   -- 'nvim-navic' only ever *references* these; nothing defines them outside of
   -- `:colorscheme jb`.
-  NavicText      = 'StatusLine',
+  NavicText      = 'Comment',
   NavicSeparator = 'NonText',
 
   -- Statusline --------------------------------------------------------------
@@ -123,6 +123,16 @@ local apply = function()
 	-- Used by the 'jb.nvim' lualine `nav_bar` component
 	vim.api.nvim_set_hl(0, "JBIconModuleProject", { link = "Directory", default = true })
 	reverse_blink_kinds()
+	-- Hairline window splits, whatever the scheme draws them as
+	vim.api.nvim_set_hl(0, "WinSeparator", { link = "NonText" })
+	-- Winbar ('plugin/92_statusline.lua'): file name in the text colour, the
+	-- breadcrumb dimmed (`NavicText` above), inactive windows dimmed whole
+	local normal_fg = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).fg
+	vim.api.nvim_set_hl(0, "WinBarFile", { fg = normal_fg, bold = true })
+	vim.api.nvim_set_hl(0, "WinBarNC", { link = "Comment" })
+	-- Status line ('plugin/92_statusline.lua') on the editor background, like
+	-- the winbar. `StatusLine` itself keeps its tint: the fzf picker uses it.
+	vim.api.nvim_set_hl(0, "StatusLineClear", { fg = normal_fg })
 end
 
 Config.new_autocmd("ColorScheme", nil, apply, "Fill in jb.nvim-specific highlight groups")

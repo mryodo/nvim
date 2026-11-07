@@ -3,19 +3,14 @@
 -- └────────────────────────┘
 --
 -- 'lualine.nvim' owns 'statusline' (globally, via `globalstatus`).
--- 'mini.statusline' is deliberately not set up. The buffer line lives in
--- 'plugin/93_ui.lua'.
+-- 'mini.statusline' is deliberately not set up. There is no buffer line.
 --
--- Laid out the way 'test-nvim' lays out its 'heirline' status line, so that the
--- three horizontal rules of the frame divide the work instead of repeating it:
+-- One bar per edge, each with its own job:
 --
--- - the buffer line names every listed buffer,
--- - 'incline' ('plugin/93_ui.lua') shows what is wrong with each window's buffer
---   and how it differs from the git index, as badges in its top-right corner,
--- - the status line spells the current file out in full -- name and the
---   'nvim-navic' symbol path the cursor is inside -- and carries the session's
---   own state around it: mode, branch, diagnostics, linters, LSP progress,
---   search, clock.
+-- - the winbar at the top of every window names its file, the 'nvim-navic'
+--   symbol path the cursor is inside, and its diffstat against the git index,
+-- - the status line carries the session's own state: mode, branch,
+--   diagnostics, linters, LSP progress, search, clock.
 
 local add = vim.pack.add
 local later = Config.later
@@ -221,21 +216,26 @@ later(function()
 	--- `ColorScheme`, so switching schemes repaints the status line instead of
 	--- leaving it stuck on whatever theme was active at startup.
 	local function refresh_palette()
-		palette.black = hl_color("Normal", "bg", "#0F131A")
+		-- Under Ghostty `Normal` has no background ('plugin/90_theme_compat.lua'),
+		-- so fall back to something that reads on a coloured block
+		palette.black = hl_color("Normal", "bg", vim.o.background == "light" and "#ffffff" or "#101010")
+		palette.fg = hl_color("Normal", "fg", vim.o.background == "light" and "#000000" or "#d0d0d0")
 		palette.dark_gray = hl_color("Comment", "fg", "#70809b")
+		-- Diagnostic groups, not syntax ones: monochrome schemes (koda) keep
+		-- syntax grey but still colour diagnostics
 		palette.red = hl_color("DiagnosticError", "fg", "#F07178")
-		palette.green = hl_color("String", "fg", "#AAD94C")
-		palette.blue = hl_color("Function", "fg", "#59C2FF")
-		palette.purple = hl_color("Statement", "fg", "#D2A6FF")
+		palette.green = hl_color("DiagnosticOk", "fg", "#AAD94C")
+		palette.blue = hl_color("DiagnosticHint", "fg", "#59C2FF")
+		palette.purple = hl_color("Constant", "fg", "#D2A6FF")
 		palette.orange = hl_color("DiagnosticWarn", "fg", "#FFB454")
 
-		-- Mode drives every colour on the line. Normal mode is the quiet state:
-		-- no block, just dim grey text. Every other mode fills the block with
-		-- its own colour, and the "secondary" items (linters, progress, search)
-		-- pick that same colour up as a foreground so the two ends of the line
-		-- agree.
+		-- Mode drives the two blocks at either end of the line: Normal mode in
+		-- the text colour (reverse video), every other mode in its own colour.
+		-- The "secondary" items (progress, search) pick that colour up as a
+		-- foreground, dimmed to grey in Normal mode. Everything else on the
+		-- line sits on the editor background.
 		-- stylua: ignore
-		mode_colors.n = palette.dark_gray; mode_colors.i = palette.green
+		mode_colors.n = palette.fg;        mode_colors.i = palette.green
 		mode_colors.v = palette.orange;    mode_colors.V = palette.orange
 		mode_colors["\22"] = palette.orange
 		mode_colors.c = palette.blue;      mode_colors["!"] = palette.blue
@@ -251,27 +251,27 @@ later(function()
 	Config.new_autocmd("ColorScheme", nil, refresh_palette, "Refresh statusline palette from theme")
 
 	local function mode_color()
-		return mode_colors[(vim.fn.mode(1) or "n"):sub(1, 1)] or palette.dark_gray
+		return mode_colors[(vim.fn.mode(1) or "n"):sub(1, 1)] or palette.fg
 	end
 
-	--- Filled block: the mode colour as a background, except in Normal mode.
+	--- Filled block: the mode colour as a background.
 	local function primary()
-		local color = mode_color()
-		if color == palette.dark_gray then
-			return { fg = color }
-		end
-		return { bg = color, fg = palette.black }
+		return { bg = mode_color(), fg = palette.black, gui = "bold" }
 	end
 
-	--- Unfilled: the mode colour as a foreground.
+	--- Unfilled: the mode colour as a foreground, grey in Normal mode.
 	local function secondary()
-		return { fg = mode_color() }
+		local color = mode_color()
+		return { fg = color == palette.fg and palette.dark_gray or color }
 	end
 
-	--- Divider between groups. Invisible in Normal mode so the quiet state stays
-	--- quiet, a bar as soon as anything is happening.
-	local function divider()
-		return mode_color() == palette.dark_gray and " " or "┃"
+	--- Attached language servers, e.g. " lua_ls"
+	local function lsp_clients()
+		local names = {}
+		for _, client in ipairs(vim.lsp.get_clients({ bufnr = 0 })) do
+			table.insert(names, client.name)
+		end
+		return #names > 0 and ("\u{f013} " .. table.concat(names, " ")) or ""
 	end
 
 	-- The same glyphs 'incline' puts in its badges ('plugin/93_ui.lua')
@@ -288,17 +288,14 @@ later(function()
 	end
 
 	-- Sections are coloured per component, so the theme only has to keep the
-	-- whole line on one background -- the same one the buffer line fills with.
-	local flat =
-		{ a = "StatusLine", b = "StatusLine", c = "StatusLine", x = "StatusLine", y = "StatusLine", z = "StatusLine" }
+	-- whole line on one background.
+	local flat = {}
+	for _, section in ipairs({ "a", "b", "c", "x", "y", "z" }) do
+		flat[section] = "StatusLineClear" -- No background ('plugin/90_theme_compat.lua')
+	end
 	local flat_theme = {}
 	for _, mode in ipairs({ "normal", "insert", "visual", "replace", "command", "terminal", "inactive" }) do
 		flat_theme[mode] = vim.deepcopy(flat)
-	end
-
-	local function navic_available()
-		local ok, navic = pcall(require, "nvim-navic")
-		return ok and navic.is_available()
 	end
 
 	require("lualine").setup({
@@ -320,10 +317,7 @@ later(function()
 		sections = {
 			lualine_a = {},
 			lualine_b = {},
-			-- Left: one filled block of mode and branch, then the breadcrumb --
-			-- the file's own icon, its name, and the symbol path the cursor is
-			-- inside. The `navic` half carries its own `%#group#` markup; the
-			-- groups it names are filled in 'plugin/90_theme_compat.lua'.
+			-- Left: one filled block of mode and branch.
 			lualine_c = {
 				{
 					"mode",
@@ -338,43 +332,6 @@ later(function()
 					icon = "",
 					color = primary,
 					padding = { left = 0, right = 1 },
-				},
-				{ divider, color = secondary, padding = { left = 1, right = 1 } },
-				{
-					"filetype",
-					icon_only = true,
-					padding = { left = 0, right = 0 },
-					fmt = function(filetype, _)
-						-- Force the default filetype icon when there is none
-						return filetype ~= "" and filetype or " "
-					end,
-				},
-				{
-					"filename",
-					path = 0,
-					color = "Title",
-					padding = { left = 0, right = 0 },
-					file_status = true,
-					newfile_status = true,
-					symbols = { newfile = "[new]", unnamed = "[no name]" },
-				},
-				-- Both hide themselves when no server can answer, so there is no
-				-- dangling "›". lualine's own `separator` is not used for this:
-				-- it draws a *transitional* highlight, which paints the glyph in
-				-- the section background and makes it invisible.
-				{
-					function()
-						return "›"
-					end,
-					cond = navic_available,
-					color = "NavicSeparator",
-					padding = { left = 1, right = 1 },
-				},
-				{
-					"navic",
-					color_correction = nil,
-					navic_opts = { click = true, highlight = true },
-					padding = { left = 0, right = 0 },
 				},
 			},
 			-- Right: what the session is busy with, then the clock as the closing
@@ -405,7 +362,7 @@ later(function()
 					padding = { left = 0, right = 1 },
 				},
 				{ "searchcount", color = secondary, padding = { left = 0, right = 1 } },
-				{ divider, color = secondary, padding = { left = 0, right = 1 } },
+				{ lsp_clients, color = "Comment", padding = { left = 0, right = 1 } },
 				{ clock, color = primary, padding = { left = 0, right = 0 } },
 			},
 			lualine_y = {},
@@ -421,4 +378,91 @@ later(function()
 			lualine_z = {},
 		},
 	})
+end)
+
+-- Winbar =====================================================================
+-- Native, not lualine's: lualine's winbar would inherit the status line's
+-- background, while 'WinBar'/'WinBarNC' follow the editor's. Set per window,
+-- and only on real file windows, so floats and tool windows stay bare.
+later(function()
+	-- stylua: ignore
+	local diff_parts = {
+		{ key = "added",   icon = "+", group = "GitSignsAdd" },
+		{ key = "changed", icon = "~", group = "GitSignsChange" },
+		{ key = "removed", icon = "-", group = "GitSignsDelete" },
+	}
+
+	Config.winbar = function()
+		local win = vim.g.statusline_winid or vim.api.nvim_get_current_win()
+		local buf = vim.api.nvim_win_get_buf(win)
+		local focused = win == vim.api.nvim_get_current_win()
+		local base = focused and "%#WinBar#" or "%#WinBarNC#"
+
+		local name = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(buf), ":t")
+		local icon, icon_hl = MiniIcons.get("file", name)
+		local parts = {
+			" ",
+			focused and ("%#" .. icon_hl .. "#") or base,
+			icon,
+			" ",
+			focused and "%#WinBarFile#" or base,
+			name:gsub("%%", "%%%%"),
+			vim.bo[buf].modified and " ●" or "",
+			base,
+			"%<", -- Narrow windows cut the breadcrumb, not the file name
+		}
+
+		local ok, navic = pcall(require, "nvim-navic")
+		if focused and ok and navic.is_available(buf) then
+			local location = navic.get_location({}, buf)
+			if location ~= "" then
+				vim.list_extend(parts, { " %#NavicSeparator#›%* ", location, base })
+			end
+		end
+
+		table.insert(parts, "%=")
+
+		-- Open file buffers, across all windows
+		local n_bufs = 0
+		for _, b in ipairs(vim.api.nvim_list_bufs()) do
+			if vim.bo[b].buflisted and vim.bo[b].buftype == "" and vim.api.nvim_buf_get_name(b) ~= "" then
+				n_bufs = n_bufs + 1
+			end
+		end
+		if focused and n_bufs > 1 then
+			table.insert(parts, "%#Comment#\u{f0222} " .. n_bufs .. "  ")
+		end
+
+		local signs = vim.b[buf].gitsigns_status_dict or {}
+		for _, part in ipairs(diff_parts) do
+			local n = tonumber(signs[part.key])
+			if n ~= nil and n > 0 then
+				table.insert(parts, (focused and ("%#" .. part.group .. "#") or base) .. part.icon .. n .. " ")
+			end
+		end
+		return table.concat(parts)
+	end
+
+	local set_winbar = function()
+		for _, win in ipairs(vim.api.nvim_list_wins()) do
+			local buf = vim.api.nvim_win_get_buf(win)
+			local is_file = vim.api.nvim_win_get_config(win).relative == ""
+				and vim.bo[buf].buftype == ""
+				and vim.api.nvim_buf_get_name(buf) ~= ""
+			local value = is_file and "%{%v:lua.Config.winbar()%}" or ""
+			if vim.wo[win].winbar ~= value then
+				vim.wo[win].winbar = value
+			end
+		end
+	end
+	set_winbar()
+	Config.new_autocmd({ "BufWinEnter", "WinNew", "BufFilePost", "FileType" }, nil, set_winbar, "Set winbar")
+
+	-- The winbar is not re-evaluated on cursor moves by itself; 'nvim-navic'
+	-- has updated its context by now (its autocommand was created first)
+	local redraw = function()
+		vim.cmd.redrawstatus()
+	end
+	Config.new_autocmd("CursorMoved", nil, redraw, "Refresh winbar breadcrumb")
+	Config.new_autocmd("User", "GitSignsUpdate", redraw, "Refresh winbar diffstat")
 end)

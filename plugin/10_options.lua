@@ -80,7 +80,7 @@ vim.g.clipboard = {
 vim.o.cmdheight       = 0                       -- Hide command line until it is needed
 vim.o.colorcolumn     = '+1'                    -- Draw column on the right of maximum width
 vim.o.cursorline      = true                    -- Enable current line highlighting
-vim.o.cursorlineopt   = 'screenline,number'     -- Show cursor line per screen line
+vim.o.cursorlineopt   = 'number'                -- Highlight only the cursor's line number
 vim.o.inccommand      = 'split'                 -- Preview substitutions live, as you type
 vim.o.list            = true                    -- Show helpful text indicators
 vim.o.number          = true                    -- Show line numbers
@@ -182,6 +182,11 @@ local fix_formatoptions = function()
 end
 Config.new_autocmd("FileType", nil, fix_formatoptions, "Proper 'formatoptions'")
 
+local highlight_yank = function()
+	vim.hl.on_yank({ timeout = 150 })
+end
+Config.new_autocmd("TextYankPost", nil, highlight_yank, "Highlight yanked text")
+
 -- There are other autocommands created by 'mini.basics'. See 'plugin/30_mini.lua'.
 
 -- Diagnostics ================================================================
@@ -197,11 +202,12 @@ local diagnostic_opts = {
 	signs = {
 		priority = 9999,
 		severity = { min = "HINT", max = "ERROR" },
+		-- No glyphs: the coloured line number below carries the severity
 		text = {
-			[severity.ERROR] = "󰅚 ",
-			[severity.WARN] = "󰀪 ",
-			[severity.INFO] = "󰋽 ",
-			[severity.HINT] = "󰌶 ",
+			[severity.ERROR] = "",
+			[severity.WARN] = "",
+			[severity.INFO] = "",
+			[severity.HINT] = "",
 		},
 		numhl = {
 			[severity.ERROR] = "DiagnosticSignError",
@@ -215,9 +221,6 @@ local diagnostic_opts = {
 	underline = { severity = { min = "HINT", max = "ERROR" } },
 
 	virtual_lines = false,
-
-	-- Message inline, but only on the cursor line
-	virtual_text = { current_line = true },
 
 	float = {
 		border = "rounded",
