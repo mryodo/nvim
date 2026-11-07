@@ -734,7 +734,6 @@ end)
 later(function()
 	add({ "https://github.com/folke/trouble.nvim" })
 	local trouble = require("trouble")
-	local ran_setup = false
 	local opts = {
 		auto_close = true,
 		win = {
@@ -829,10 +828,6 @@ later(function()
 	}
 	opts.icons = { kinds = require("jb.icons").kind }
 	trouble.setup(opts)
-	ran_setup = true
-	if not ran_setup then
-		trouble.setup(opts)
-	end
 
 	vim.keymap.set("n", "]p", function()
 		require("trouble")._action("next")("document_diagnostics")

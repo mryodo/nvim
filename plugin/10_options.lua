@@ -159,7 +159,7 @@ vim.o.shiftwidth      = 2                       -- Use this number of spaces for
 vim.o.smartcase       = true                    -- Respect case if search pattern has upper case
 vim.o.smartindent     = true                    -- Make indenting smart
 vim.o.softtabstop     = 2                       -- Treat this many spaces as a tab when editing
-vim.o.spell    = false                 -- Treat camelCase word parts as separate words
+vim.o.spell           = false                   -- Spell checking off ('harper_ls' via `:HarperToggle`)
 vim.o.spelloptions    = 'camel'                 -- Treat camelCase word parts as separate words
 vim.o.tabstop         = 2                       -- Show tab as this number of spaces
 vim.o.virtualedit     = 'onemore'               -- Allow moving one column past end of line
@@ -187,21 +187,6 @@ local fix_formatoptions = function()
 	vim.cmd("setlocal formatoptions-=c formatoptions-=o")
 end
 Config.new_autocmd("FileType", nil, fix_formatoptions, "Proper 'formatoptions'")
-
--- Tree-sitter folds need the parser to be started first, which `FileType` in
--- 'plugin/40_lsp.lua' only does for a known language list. Julia is folded via
--- tree-sitter here so that `zx` refreshes folds right after the parser starts.
-local start_julia_folds = function(args)
-	if not pcall(vim.treesitter.start, args.buf, "julia") then
-		return
-	end
-	vim.wo.foldmethod = "expr"
-	vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-	vim.wo.foldlevel = 99
-	vim.wo.foldenable = true
-	vim.cmd("normal! zx")
-end
-Config.new_autocmd("FileType", "julia", start_julia_folds, "Tree-sitter folds for Julia")
 
 -- There are other autocommands created by 'mini.basics'. See 'plugin/30_mini.lua'.
 

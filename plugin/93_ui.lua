@@ -13,132 +13,13 @@ local now, later = Config.now, Config.later
 -- Installed and available via `:colorscheme` / `<Leader>fC`. Only the schemes
 -- that need a `setup()` call before use are configured here.
 --
--- Deferred on purpose: none of these is the active scheme, so pulling 18 repos
+-- Deferred on purpose: none of these is the active scheme, so pulling 22 repos
 -- into 'runtimepath' and sourcing their `plugin/` files is pure startup cost.
 -- `later()` does it once the first screen is on the terminal.
 later(function()
-	add({
-		"https://github.com/Aejkatappaja/cendre",
-		"https://github.com/MartyBeGood/lorem-gypsum.nvim",
-		"https://github.com/Shatur/neovim-ayu",
-		"https://github.com/WTFox/luna.nvim",
-		"https://github.com/ellisonleao/gruvbox.nvim",
-		"https://github.com/neanias/everforest",
-		"https://github.com/jpwol/thorn.nvim",
-		"https://github.com/mcauley-penney/techbase.nvim",
-		"https://github.com/mitander/flume.nvim",
-		"https://github.com/mryodo/rwth.nvim",
-		"https://github.com/nendix/zen.nvim",
-		"https://github.com/nyoom-engineering/oxocarbon.nvim",
-		"https://github.com/slugbyte/lackluster.nvim",
-		"https://github.com/tanmaymanojgandhi/circadia",
-		"https://github.com/thesimonho/kanagawa-paper.nvim",
-		"https://github.com/vague-theme/vague.nvim",
-		"https://github.com/webhooked/kanso.nvim",
-		"https://github.com/ThorstenRhau/token",
-	})
-
-	require("rwth").setup({ transparent = false })
-
-	-- 'circadia' nests its Neovim port under 'ports/neovim' rather than the
-	-- plugin root, so its `lua/circadia` module is invisible to the native
-	-- loader until that subdirectory joins 'runtimepath' too. Its
-	-- `colors/circadia-dark.lua` and `colors/circadia-light.lua` entrypoints
-	-- (kept in this repo, since the plugin ships no `colors/*.lua` of its own)
-	-- depend on this to make `:colorscheme circadia-dark` work.
-	local circadia = vim.pack.get({ "circadia" })[1]
-	vim.opt.rtp:prepend(vim.fs.joinpath(circadia.path, "ports", "neovim"))
-
-end)
-
--- File icons =================================================================
-now(function()
-	add({ "https://github.com/nvim-tree/nvim-web-devicons" })
-	add({ "https://github.com/nickkadutskyi/jb.nvim" })
-	local devicons = require("nvim-web-devicons")
-	local icons = require("jb.icons")
-
-	devicons.setup({
-		default = false,
-		strict = true,
-		color_icons = true,
-		override = {
-			zsh = { icon = "", color = "#428850", cterm_color = "65", name = "Zsh" },
-		},
-		override_by_filename = icons.files.by_filename,
-		override_by_extension = icons.files.by_extension,
-	})
-	devicons.set_icon(icons.by_variant(vim.o.background))
-
-	-- Icons come in light and dark variants; re-apply when 'background' flips
-	local sync_icons = function()
-		later(function()
-			devicons.set_icon(icons.by_variant(vim.o.background))
-		end)
-	end
-	Config.new_autocmd("OptionSet", "background", sync_icons, "Sync devicons with 'background'")
-end)
-
--- Active colorscheme =========================================================
-now(function()
-	add({ "https://github.com/nickkadutskyi/jb.nvim" })
-	local borders = require("jb.borders").borders.dialog
-
-	-- 'fff' is not installed; these conditions are no-ops until it is. They are
-	-- kept because the border styles they pick are what the picker expects.
-	local fff_buf = function(field)
-		return function(bufnr, _)
-			local ok, state = pcall(require, "fff.picker_ui.picker_ui_state")
-			return ok and state ~= nil and bufnr == state.state[field]
-		end
-	end
-
-	require("jb").setup({
-		transparent = false,
-		integrations = { ghostty = true },
-		enforce_float_style = {
-			{
-				style = { border = borders.default_box_header_shadowed },
-				condition = function(_, config)
-					if type(config.title) ~= "string" then
-						return false
-					end
-					return config.title == " Plugins " or config.title:find("99") ~= nil
-				end,
-			},
-			{
-				style = { border = borders.default_box_split_top_no_footer_shadowed },
-				condition = fff_buf("input_buf"),
-			},
-			{
-				style = { border = borders.default_box_split_middle_shadowed_no_footer },
-				condition = fff_buf("list_buf"),
-			},
-			{
-				style = { border = borders.default_box_split_bottom_shadowed_header },
-				condition = fff_buf("preview_buf"),
-			},
-		},
-	})
-
-	-- Active scheme: 'minischeme2-dark' / 'minischeme2-light'.
-	-- `\b` still toggles 'background' and syncs Kitty.
-	--
-	-- 'jb.nvim' stays installed: `jb.icons` and `jb.borders` are used across
-	-- this config and `:colorscheme jb` still works. The JetBrains-specific
-	-- highlight groups it would otherwise define (dialog and tool-window
-	-- borders, `JBIcon*`, the statusline groups) are bridged to standard ones
-	-- for every other scheme in 'plugin/90_theme_compat.lua'.
-	add({
-		"https://github.com/rktjmp/lush.nvim",
-		"https://github.com/lucobellic/ayugloom.nvim",
-		"https://github.com/mcauley-penney/techbase.nvim",
-	})
-	vim.pack.add({
-		"https://codeberg.org/navahas/sanzo.nvim",
-	})
 	-- 'colors/everforest-{dark,light}.lua' wrap it, so the names match the
 	-- Kitty/Ghostty theme files and threader's themes.
+	-- Before the list below: 'neanias/everforest' also ships a `lua/everforest`.
 	add({ "https://github.com/neanias/everforest-nvim" })
 	require("everforest").setup({
 		background = "medium",
@@ -154,6 +35,71 @@ now(function()
 		inlay_hints_background = "none",
 	})
 
+	add({
+		"https://github.com/Aejkatappaja/cendre",
+		"https://github.com/MartyBeGood/lorem-gypsum.nvim",
+		"https://github.com/Shatur/neovim-ayu",
+		"https://github.com/WTFox/luna.nvim",
+		"https://github.com/ellisonleao/gruvbox.nvim",
+		"https://github.com/neanias/everforest",
+		"https://github.com/jpwol/thorn.nvim",
+		"https://github.com/mcauley-penney/techbase.nvim",
+		"https://github.com/mitander/flume.nvim",
+		"https://github.com/nendix/zen.nvim",
+		"https://github.com/nyoom-engineering/oxocarbon.nvim",
+		"https://github.com/slugbyte/lackluster.nvim",
+		"https://github.com/tanmaymanojgandhi/circadia",
+		"https://github.com/thesimonho/kanagawa-paper.nvim",
+		"https://github.com/vague-theme/vague.nvim",
+		"https://github.com/webhooked/kanso.nvim",
+		"https://github.com/ThorstenRhau/token",
+		"https://github.com/rktjmp/lush.nvim",
+		"https://github.com/lucobellic/ayugloom.nvim",
+		"https://codeberg.org/navahas/sanzo.nvim",
+		"https://github.com/mryodo/rwth.nvim",
+	})
+
+	require("rwth").setup({ transparent = false })
+
+	-- 'circadia' nests its Neovim port under 'ports/neovim' rather than the
+	-- plugin root, so its `lua/circadia` module is invisible to the native
+	-- loader until that subdirectory joins 'runtimepath' too. Its
+	-- `colors/circadia-dark.lua` and `colors/circadia-light.lua` entrypoints
+	-- (kept in this repo, since the plugin ships no `colors/*.lua` of its own)
+	-- depend on this to make `:colorscheme circadia-dark` work.
+	local circadia = vim.pack.get({ "circadia" })[1]
+	vim.opt.rtp:prepend(vim.fs.joinpath(circadia.path, "ports", "neovim"))
+end)
+
+-- Active colorscheme =========================================================
+now(function()
+	add({ "https://github.com/nickkadutskyi/jb.nvim" })
+	local borders = require("jb.borders").borders.dialog
+
+	require("jb").setup({
+		transparent = false,
+		integrations = { ghostty = true },
+		enforce_float_style = {
+			{
+				style = { border = borders.default_box_header_shadowed },
+				condition = function(_, config)
+					if type(config.title) ~= "string" then
+						return false
+					end
+					return config.title == " Plugins " or config.title:find("99") ~= nil
+				end,
+			},
+		},
+	})
+
+	-- Active scheme: 'koda-dark' / 'koda-glade'.
+	-- `\b` still toggles 'background' and syncs Kitty.
+	--
+	-- 'jb.nvim' stays installed: `jb.icons` and `jb.borders` are used across
+	-- this config and `:colorscheme jb` still works. The JetBrains-specific
+	-- highlight groups it would otherwise define (dialog and tool-window
+	-- borders, `JBIcon*`, the statusline groups) are bridged to standard ones
+	-- for every other scheme in 'plugin/90_theme_compat.lua'.
 	add({ "https://github.com/oskarnurm/koda.nvim" })
 	require("koda").setup({ theme = { dark = "dark", light = "glade" } })
 
@@ -166,7 +112,8 @@ now(function()
 	-- local background_schemes = { light = "everforest-light", dark = "everforest-dark" }
 	-- local background_schemes = { light = "rwth-light", dark = "rwth-dark" }
 	-- local background_schemes = { light = "circadia-light", dark = "circadia-dark" }
-	local background_schemes = { light = "minischeme2-light", dark = "minischeme2-dark" }
+	-- local background_schemes = { light = "minischeme2-light", dark = "minischeme2-dark" }
+	local background_schemes = { light = "koda-glade", dark = "koda-dark" }
 
 	-- Persisted across sessions so a new `nvim` starts in whatever 'background'
 	-- the last `\b` left behind, whether that happened in this terminal or
@@ -271,7 +218,6 @@ later(function()
 	-- and it does not count diagnostics either; those are on the status line,
 	-- where they are counted once rather than once per split.
 	add({ "https://github.com/b0o/incline.nvim" })
-	add({ "https://github.com/nvim-lua/plenary.nvim" })
 
 	local UNFOCUSED = "NonText"
 
@@ -315,7 +261,8 @@ later(function()
 	add({ "https://github.com/lukas-reineke/indent-blankline.nvim" })
 	require("ibl").setup({
 		indent = { char = "▏", tab_char = "▏" },
-		scope = { char = "▏", show_start = false, show_end = false },
+		-- 'mini.indentscope' ('plugin/30_mini.lua') already draws the scope
+		scope = { enabled = false },
 	})
 
 	add({ "https://github.com/nvim-treesitter/nvim-treesitter-textobjects" })
@@ -457,29 +404,19 @@ end)
 -- Deferred: the popup only ever appears after 'timeoutlen' on a <Leader> press.
 later(function()
 	add({ "https://github.com/folke/which-key.nvim" })
-	require("which-key").setup({})
+	local wk = require("which-key")
+	wk.setup({})
+	for _, clue in ipairs(Config.leader_group_clues) do
+		wk.add({ clue.keys, group = clue.desc:sub(2), mode = clue.mode })
+	end
 
 	add({ "https://github.com/folke/zen-mode.nvim" })
 	require("zen-mode").setup({
 		window = {
-			backdrop = 0.95, -- shade the backdrop of the Zen window. Set to 1 to keep the same as Normal
-			-- height and width can be:
-			-- * an absolute number of cells when > 1
-			-- * a percentage of the width / height of the editor when <= 1
-			-- * a function that returns the width or the height
-			width = 80, -- width of the Zen window
-			height = 0.9, -- height of the Zen window
-			-- by default, no options are changed for the Zen window
-			-- uncomment any of the options below, or add other vim.wo options you want to apply
-			options = {
-				-- signcolumn = "no", -- disable signcolumn
-				-- number = false, -- disable number column
-				-- relativenumber = false, -- disable relative numbers
-				cursorline = true, -- disable cursorline
-				-- cursorcolumn = true, -- disable cursor column
-				-- foldcolumn = "0", -- disable fold column
-				-- list = false, -- disable whitespace characters
-			},
+			backdrop = 0.95,
+			width = 80,
+			height = 0.9,
+			options = { cursorline = true },
 		},
 	})
 end)

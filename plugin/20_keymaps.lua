@@ -18,15 +18,7 @@
 
 -- General mappings ===========================================================
 
--- An example helper to create a Normal mode mapping. See `:h vim.keymap.set()`.
-local nmap = function(lhs, rhs, desc)
-	vim.keymap.set("n", lhs, rhs, { desc = desc })
-end
-
--- Paste linewise before/after current line
--- Usage: `yiw` to yank a word and `]p` to put it on the next line.
-nmap("[p", '<Cmd>exe "iput! " . v:register<CR>', "Paste Above")
-nmap("]p", '<Cmd>exe "iput "  . v:register<CR>', "Paste Below")
+-- `[p`/`]p` jump between problems ('trouble.nvim', 'plugin/94_completion.lua').
 
 -- Many general mappings are created by 'mini.basics'. See 'plugin/30_mini.lua'
 
@@ -52,7 +44,7 @@ nmap("]p", '<Cmd>exe "iput "  . v:register<CR>', "Paste Below")
 -- denotes global and uppercase - local.
 -- Example: `<Leader>fs` / `<Leader>fS` - find workspace/document LSP symbols.
 
--- Information about Leader groups, consumed by 'which-key.nvim'.
+-- Information about Leader groups, fed to 'which-key.nvim' ('plugin/93_ui.lua').
 -- Add an entry if you create a new group.
 Config.leader_group_clues = {
   { mode = 'n', keys = '<Leader>a', desc = '+AI' },
@@ -63,7 +55,6 @@ Config.leader_group_clues = {
   { mode = 'n', keys = '<Leader>g', desc = '+Git' },
   { mode = 'n', keys = '<Leader>j', desc = '+Julia REPL' },
   { mode = 'n', keys = '<Leader>l', desc = '+Language' },
-  { mode = 'n', keys = '<Leader>m', desc = '+Map' },
   { mode = 'n', keys = '<Leader>o', desc = '+Other' },
   { mode = 'n', keys = '<Leader>r', desc = '+Run cell' },
   { mode = 'n', keys = '<Leader>t', desc = '+Terminal' },
@@ -147,7 +138,6 @@ nmap_leader('eQ', explore_locations,                         'Location list')
 
 -- g is for 'Git'. Common usage:
 -- - `<Leader>gs` - show information at cursor
--- - `<Leader>go` - toggle 'mini.diff' overlay to show in-buffer unstaged changes
 -- - `<Leader>gd` - show unstaged changes as a patch in separate tabpage
 -- - `<Leader>gL` - show Git log of current file
 -- `<Leader>gg` opens lazygit; see 'plugin/50_lazygit.lua'.
@@ -162,7 +152,6 @@ nmap_leader('gd', '<Cmd>Git diff<CR>',                       'Diff')
 nmap_leader('gD', '<Cmd>Git diff -- %<CR>',                  'Diff buffer')
 nmap_leader('gl', '<Cmd>' .. git_log_cmd .. '<CR>',          'Log')
 nmap_leader('gL', '<Cmd>' .. git_log_buf_cmd .. '<CR>',      'Log buffer')
-nmap_leader('go', '<Cmd>lua MiniDiff.toggle_overlay()<CR>',  'Toggle overlay')
 nmap_leader('gs', '<Cmd>lua MiniGit.show_at_cursor()<CR>',   'Show at cursor')
 
 xmap_leader('gs', '<Cmd>lua MiniGit.show_at_cursor()<CR>',   'Show at selection')
@@ -195,15 +184,6 @@ nmap_leader('lt', '<Cmd>lua vim.lsp.buf.type_definition()<CR>',  'Type definitio
 
 xmap_leader('lf', '<Cmd>lua require("conform").format()<CR>',    'Format selection')
 
--- m is for 'Map'. Common usage:
--- - `<Leader>mt` - toggle map from 'mini.map' (closed by default)
--- - `<Leader>mf` - focus on the map for fast navigation
--- - `<Leader>ms` - change map's side (if it covers something underneath)
-nmap_leader('mf', '<Cmd>lua MiniMap.toggle_focus()<CR>',     'Focus (toggle)')
-nmap_leader('mr', '<Cmd>lua MiniMap.refresh()<CR>',          'Refresh')
-nmap_leader('ms', '<Cmd>lua MiniMap.toggle_side()<CR>',      'Side (toggle)')
-nmap_leader('mt', '<Cmd>lua MiniMap.toggle()<CR>',           'Toggle')
-
 -- o is for 'Other'. Common usage:
 -- - `<Leader>oz` - toggle between "zoomed" and regular view of current buffer
 -- `<Leader>oe` / `<Leader>op` open tool windows; see 'plugin/94_completion.lua'.
@@ -215,20 +195,8 @@ nmap_leader('oz', '<Cmd>lua MiniMisc.zoom()<CR>',            'Zoom toggle')
 nmap_leader('tT', '<Cmd>horizontal term<CR>',                'Terminal (horizontal)')
 nmap_leader('tt', '<Cmd>vertical term<CR>',                  'Terminal (vertical)')
 
--- v is for 'Visits'. Common usage:
--- - `<Leader>vv` - add    "core" label to current file.
--- - `<Leader>vV` - remove "core" label to current file.
--- - `<Leader>vc` - pick among all files with "core" label.
-local make_pick_core = function(cwd, desc)
-  return function()
-    local sort_latest = MiniVisits.gen_sort.default({ recency_weight = 1 })
-    local local_opts = { cwd = cwd, filter = 'core', sort = sort_latest }
-    MiniExtra.pickers.visit_paths(local_opts, { source = { name = desc } })
-  end
-end
-
-nmap_leader('vc', make_pick_core('', 'Core visits (all)'),   'Core visits (all)')
-nmap_leader('vC', make_pick_core(nil, 'Core visits (cwd)'),  'Core visits (cwd)')
+-- v is for 'Visits'. Labels only: the label pickers need 'mini.pick', which is
+-- not set up.
 nmap_leader('vv', '<Cmd>lua MiniVisits.add_label("core")<CR>',     'Add "core" label')
 nmap_leader('vV', '<Cmd>lua MiniVisits.remove_label("core")<CR>',  'Remove "core" label')
 nmap_leader('vl', '<Cmd>lua MiniVisits.add_label()<CR>',     'Add label')

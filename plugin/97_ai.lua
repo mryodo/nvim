@@ -47,7 +47,6 @@ later(function()
 	add({ "https://github.com/coder/claudecode.nvim" })
 	require("claudecode").setup()
 
-	vim.keymap.set("n", "<leader>a", "<nop>", { desc = "AI/Claude Code" })
 	vim.keymap.set("n", "<leader>ac", "<cmd>ClaudeCode<cr>", { desc = "Toggle Claude" })
 	vim.keymap.set("n", "<leader>af", "<cmd>ClaudeCodeFocus<cr>", { desc = "Focus Claude" })
 	vim.keymap.set("n", "<leader>ar", "<cmd>ClaudeCode --resume<cr>", { desc = "Resume Claude" })

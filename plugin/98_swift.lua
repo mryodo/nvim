@@ -1,7 +1,7 @@
 local add = vim.pack.add
-local later = Config.later
 
-later(function()
+-- Loaded on the first `swift` buffer: nothing here is useful before that.
+Config.on_filetype("swift", function()
 	add({ "https://github.com/devswiftzone/swift.nvim" })
 	require("swift").setup({
 		features = {

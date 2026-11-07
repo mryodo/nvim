@@ -1,6 +1,6 @@
 local now, now_if_args, later = Config.now, Config.now_if_args, Config.later
 
--- Colorscheme is set in 'plugin/93_ui.lua' (jb.nvim); 'mini.hues'-based schemes
+-- Colorscheme is set in 'plugin/93_ui.lua'; 'mini.hues'-based schemes
 -- live in 'colors/' and can be picked with `:colorscheme` / `<Leader>fC`.
 
 now(function()
@@ -29,19 +29,12 @@ now(function()
 			return not (ext3_blocklist[ext:sub(-3)] or ext4_blocklist[ext:sub(-4)])
 		end,
 	})
-	later(MiniIcons.mock_nvim_web_devicons)
+	-- Right away, not in `later()`: 'bufferline.nvim' draws its first frame with
+	-- whatever `require("nvim-web-devicons")` returns.
+	MiniIcons.mock_nvim_web_devicons()
 	later(MiniIcons.tweak_lsp_kind)
 end)
 
--- now(function()
---   require("mini.notify").setup({
---     window = {
---       config = {
---         border = "solid",
---       },
---     }
---   })
--- end)
 
 now(function()
 	require("mini.sessions").setup()
@@ -85,50 +78,12 @@ later(function()
 	require("mini.bufremove").setup()
 end)
 
--- later(function()
---   local miniclue = require("mini.clue")
---   -- stylua: ignore
---   miniclue.setup({
---     clues = {
---       -- This is defined in 'plugin/20_keymaps.lua' with Leader group descriptions
---       Config.leader_group_clues,
---       miniclue.gen_clues.builtin_completion(),
---       miniclue.gen_clues.g(),
---       miniclue.gen_clues.marks(),
---       miniclue.gen_clues.registers(),
---       miniclue.gen_clues.square_brackets(),
---       miniclue.gen_clues.windows({ submode_resize = true }),
---       miniclue.gen_clues.z(),
---     },
---     triggers = {
---       { mode = { 'n', 'x' }, keys = '<Leader>' }, -- Leader triggers
---       { mode = 'n',          keys = '\\' },       -- mini.basics
---       { mode = { 'n', 'x' }, keys = '[' },        -- mini.bracketed
---       { mode = { 'n', 'x' }, keys = ']' },
---       { mode = 'i',          keys = '<C-x>' },    -- Built-in completion
---       { mode = { 'n', 'x' }, keys = 'g' },        -- `g` key
---       { mode = { 'n', 'x' }, keys = "'" },        -- Marks
---       { mode = { 'n', 'x' }, keys = '`' },
---       { mode = { 'n', 'x' }, keys = '"' },        -- Registers
---       { mode = { 'i', 'c' }, keys = '<C-r>' },
---       { mode = 'n',          keys = '<C-w>' },    -- Window commands
---       { mode = { 'n', 'x' }, keys = 's' },        -- `s` key (mini.surround, etc.)
---       { mode = { 'n', 'x' }, keys = 'z' },        -- `z` key
---     },
---   })
--- end)
 
--- later(function()
---   require("mini.cmdline").setup()
--- end)
 
 later(function()
 	require("mini.comment").setup()
 end)
 
--- later(function()
---   require("mini.diff").setup()
--- end)
 
 later(function()
 	require("mini.git").setup()
@@ -140,9 +95,6 @@ later(function()
 	})
 end)
 
--- later(function()
--- 	require("mini.jump").setup()
--- end)
 
 later(function()
 	require("mini.keymap").setup()
@@ -201,10 +153,7 @@ later(function()
 				input = { "\\begin%b{}%s*().-()%s*\\end%b{}" },
 				output = function()
 					local env = MiniInput.get({ prompt = "Environment: ", scope = "cursor" })
-					if env == "" then
-						return nil
-					end
-					if env == nil then
+					if env == nil or env == "" then
 						return nil
 					end
 					return {
@@ -217,10 +166,7 @@ later(function()
 				input = { "\\%a+%b{}", "^\\%a+{().*()}$" },
 				output = function()
 					local fn = MiniInput.get({ prompt = "Command: ", scope = "cursor" })
-					if fn == "" then
-						return nil
-					end
-					if fn == nil then
+					if fn == nil or fn == "" then
 						return nil
 					end
 					return { left = "\\" .. fn .. "{", right = "}" }
@@ -236,9 +182,6 @@ end)
 
 later(function()
 	require("mini.visits").setup()
-end)
-later(function()
-	require("mini.fuzzy").setup()
 end)
 later(function()
 	require("mini.input").setup()

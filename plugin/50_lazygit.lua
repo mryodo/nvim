@@ -23,7 +23,8 @@ local function open_lazygit()
 	})
 
 	-- Start lazygit (fresh every time)
-	vim.fn.termopen("lazygit", {
+	vim.fn.jobstart("lazygit", {
+		term = true,
 		on_exit = function(_, exit_code)
 			if vim.api.nvim_win_is_valid(win) then
 				vim.api.nvim_win_close(win, true)
@@ -43,12 +44,3 @@ local function setup()
 end
 
 later(setup)
-
--- now_if_args(function()
---   add({ 'https://github.com/103sbavert/lazygit.nvim' })
---   require("lazygit").setup({
---     config = function()
---       require("telescope").load_extension("lazygit")
---     end,
---   })
--- end)

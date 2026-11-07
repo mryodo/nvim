@@ -291,10 +291,6 @@ later(function()
 		return ok and navic.is_available()
 	end
 
-	local function no_jujutsu()
-		return not require("lualine.components.jujutsu").is_jujutsu_repo()
-	end
-
 	require("lualine").setup({
 		options = {
 			theme = flat_theme,
@@ -324,10 +320,7 @@ later(function()
 					icon = "",
 					color = primary,
 					padding = { left = 0, right = 1 },
-					cond = no_jujutsu,
 				},
-				-- Local component, see 'lua/lualine/components/jujutsu.lua'
-				{ "jujutsu", color = primary, padding = { left = 0, right = 1 } },
 				{ divider, color = secondary, padding = { left = 1, right = 1 } },
 				{
 					"filetype",

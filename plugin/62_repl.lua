@@ -1,7 +1,26 @@
 local add = vim.pack.add
-local now_if_args = Config.now_if_args
+local now_if_args, later = Config.now_if_args, Config.later
 
+-- Opens `.ipynb` through `BufReadCmd`, so it must be in place before a file
+-- given as an argument is read.
 now_if_args(function()
+	vim.pack.add({
+		{ src = "https://github.com/sheng-tse/jupynvim", version = vim.version.range("*") },
+	})
+	require("jupynvim").setup({})
+	vim.api.nvim_create_autocmd("PackChanged", {
+		callback = function(ev)
+			local d = ev.data
+			if d.spec.name == "jupynvim" and (d.kind == "install" or d.kind == "update") then
+				dofile(d.path .. "/lua/jupynvim/install.lua").run({ dir = d.path })
+			end
+		end,
+	})
+end)
+
+-- Deferred: ~25ms of startup otherwise. Buffers opened before this ran missed
+-- the quarto ftplugin and the jet `FileType` keymaps, so re-fire it for them.
+later(function()
 	add({ "https://github.com/goerz/vim-slime" })
 	add({
 		"https://github.com/jmbuhr/otter.nvim",
@@ -148,19 +167,6 @@ now_if_args(function()
 		end,
 	})
 
-	vim.pack.add({
-		{ src = "https://github.com/sheng-tse/jupynvim", version = vim.version.range("*") },
-	})
-	require("jupynvim").setup({})
-	vim.api.nvim_create_autocmd("PackChanged", {
-		callback = function(ev)
-			local d = ev.data
-			if d.spec.name == "jupynvim" and (d.kind == "install" or d.kind == "update") then
-				dofile(d.path .. "/lua/jupynvim/install.lua").run({ dir = d.path })
-			end
-		end,
-	})
-
 	-- Julia REPL in a kitty window, see 'lua/julia-repl/'
 	require("julia-repl.init").setup({
 		listen_on = "unix:/tmp/kitty",
@@ -177,4 +183,11 @@ now_if_args(function()
 			enter_visual = "<CR>",
 		},
 	})
+
+	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+		local ft = vim.bo[buf].filetype
+		if ft == "julia" or ft == "quarto" then
+			vim.bo[buf].filetype = ft
+		end
+	end
 end)

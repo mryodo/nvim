@@ -855,21 +855,27 @@ function M.setup(opts)
 	if config.keymaps then
 		local km = config.keymaps
 
-		if vim.bo.filetype == "julia" then
+		-- Buffer-local: global maps would hijack `<CR>` in every other buffer.
+		local function set_keymaps(args)
+			local function map(mode, lhs, rhs, opts)
+				opts.buffer = args.buf
+				vim.keymap.set(mode, lhs, rhs, opts)
+			end
+
 			if km.open then
-				vim.keymap.set("n", km.open, M.open, {
+				map("n", km.open, M.open, {
 					desc = "Open Julia in Kitty and configure vim-slime",
 				})
 			end
 
 			if km.line then
-				vim.keymap.set("n", km.line, M.send_line, {
+				map("n", km.line, M.send_line, {
 					desc = "Send current line to Julia via vim-slime",
 				})
 			end
 
 			if km.visual then
-				vim.keymap.set("x", km.visual, function()
+				map("x", km.visual, function()
 					M.send_visual()
 				end, {
 					desc = "Send visual selection to Julia via vim-slime",
@@ -877,11 +883,11 @@ function M.setup(opts)
 			end
 
 			if km.enclosing then
-				vim.keymap.set("n", km.enclosing, M.send_enclosing, {
+				map("n", km.enclosing, M.send_enclosing, {
 					desc = "Send enclosing Julia block/function via vim-slime",
 				})
 
-				vim.keymap.set("x", km.enclosing, function()
+				map("x", km.enclosing, function()
 					local start_line = vim.fn.line("'<")
 					local end_line = vim.fn.line("'>")
 					M.send_enclosing_range(start_line, end_line)
@@ -891,20 +897,20 @@ function M.setup(opts)
 			end
 
 			if km.buffer then
-				vim.keymap.set("n", km.buffer, M.send_buffer, {
+				map("n", km.buffer, M.send_buffer, {
 					desc = "Send whole buffer to Julia via vim-slime",
 				})
 			end
 
 			if km.enter_normal then
-				vim.keymap.set("n", km.enter_normal, M.send_executable_or_line, {
+				map("n", km.enter_normal, M.send_executable_or_line, {
 					desc = "Send enclosing Julia executable block or current line",
 					silent = true,
 				})
 			end
 
 			if km.enter_visual then
-				vim.keymap.set("x", km.enter_visual, function()
+				map("x", km.enter_visual, function()
 					local start_line = vim.fn.getpos("v")[2]
 					local end_line = vim.fn.getpos(".")[2]
 
@@ -918,6 +924,10 @@ function M.setup(opts)
 					silent = true,
 				})
 			end
+		end
+		vim.api.nvim_create_autocmd("FileType", { pattern = "julia", callback = set_keymaps })
+		if vim.bo.filetype == "julia" then
+			set_keymaps({ buf = vim.api.nvim_get_current_buf() })
 		end
 	end
 end
