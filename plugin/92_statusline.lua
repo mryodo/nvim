@@ -187,6 +187,16 @@ later(function()
 		["SHELL"]     = "Sh", ["TERMINAL"]  = "TE",
 	}
 
+	-- stylua: ignore
+	local mode_icons = {
+		["NORMAL"]    = "", ["O-PENDING"] = "", ["VISUAL"]  = "",
+		["V-LINE"]    = "", ["V-BLOCK"]   = "", ["SELECT"]  = "",
+		["S-LINE"]    = "", ["S-BLOCK"]   = "", ["INSERT"]  = "",
+		["REPLACE"]   = "", ["V-REPLACE"] = "", ["COMMAND"] = "",
+		["EX"]        = "", ["MORE"]      = "", ["CONFIRM"] = "",
+		["SHELL"]     = "", ["TERMINAL"]  = "",
+	}
+
 	--- Reads a colour straight out of a highlight group instead of hardcoding a
 	--- hex, so the status line follows whatever `:colorscheme` is active rather
 	--- than only ever agreeing with one scheme. `attr` is `"fg"` or `"bg"`;
@@ -298,6 +308,14 @@ later(function()
 			component_separators = { left = "", right = "" },
 			section_separators = { left = "", right = "" },
 			always_divide_middle = true,
+			-- Default also re-evaluates the whole line on every |CursorMovedI|,
+			-- i.e. on every keystroke in Insert mode. Nothing here needs that.
+			refresh = {
+				events = {
+					"WinEnter", "BufEnter", "BufWritePost", "SessionLoadPost", "FileChangedShellPost",
+					"VimResized", "Filetype", "CursorMoved", "ModeChanged",
+				},
+			},
 		},
 		sections = {
 			lualine_a = {},
@@ -310,14 +328,14 @@ later(function()
 				{
 					"mode",
 					fmt = function(mode)
-						return short_mode[mode] or mode
+						return (mode_icons[mode] or "") .. " " .. (short_mode[mode] or mode)
 					end,
 					color = primary,
 					padding = { left = 1, right = 1 },
 				},
 				{
 					"branch",
-					icon = "",
+					icon = "",
 					color = primary,
 					padding = { left = 0, right = 1 },
 				},

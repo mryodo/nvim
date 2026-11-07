@@ -241,10 +241,9 @@ now(function()
 			menu = {
 				border = "single",
 				auto_show = true,
-				-- Don't build and paint the menu on every keystroke of a burst.
-				-- This is the single biggest "typing feels smooth" knob here:
-				-- fast typing never materialises a window at all.
-				auto_show_delay_ms = 300,
+				-- Don't build and paint the menu on every keystroke of a burst,
+				-- but short enough that it still feels instant on a pause.
+				auto_show_delay_ms = 100,
 				-- Keep the menu below the cursor unless there is no room, so it
 				-- doesn't jump over the line being edited.
 				direction_priority = { "n", "s" },

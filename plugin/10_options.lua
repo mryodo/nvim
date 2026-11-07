@@ -42,6 +42,7 @@ vim.o.shada          = "'100,<50,s10,:1000,/100,@100,h" -- Limit ShaDa file (for
 vim.o.timeout        = true
 vim.o.timeoutlen     = 300
 vim.o.ttimeoutlen    = 10                       -- Don't linger after <Esc> in a terminal escape sequence
+vim.o.updatetime     = 250                      -- CursorHold sooner (navic breadcrumbs, swap writes)
 
 -- Enable all filetype plugins and syntax (if not enabled, for better startup)
 vim.cmd('filetype plugin indent on')

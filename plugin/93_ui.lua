@@ -261,8 +261,7 @@ later(function()
 	add({ "https://github.com/lukas-reineke/indent-blankline.nvim" })
 	require("ibl").setup({
 		indent = { char = "▏", tab_char = "▏" },
-		-- 'mini.indentscope' ('plugin/30_mini.lua') already draws the scope
-		scope = { enabled = false },
+		scope = { char = "▏", show_start = false, show_end = false },
 	})
 
 	add({ "https://github.com/nvim-treesitter/nvim-treesitter-textobjects" })

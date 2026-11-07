@@ -89,12 +89,6 @@ later(function()
 	require("mini.git").setup()
 end)
 
-later(function()
-	require("mini.indentscope").setup({
-		symbol = "▏",
-	})
-end)
-
 
 later(function()
 	require("mini.keymap").setup()
