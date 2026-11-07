@@ -116,46 +116,33 @@ later(function()
 	opts.buffers.actions = opts.buffers.actions or {}
 	opts.buffers.actions["alt-backspace"] = { fn = actions.buf_del, reload = true }
 
-	local icons = require("jb.icons")
 
-	-- Plain borders, matching 'winborder' ('plugin/10_options.lua')
-	opts.winopts.border = "rounded"
-	opts.winopts.preview.border = "rounded"
+	-- Padding in the float tint, no drawn lines, matching 'winborder'
+	-- ('plugin/10_options.lua')
+	opts.winopts.border = "solid"
+	opts.winopts.preview.border = Config.float_border_after -- Rule between results and preview
 
-	opts.lsp.symbols.symbol_icons = icons.kind
+	opts.lsp.symbols.symbol_icons = Config.kind_icons
 
 	require("fzf-lua").setup(opts)
 
-	-- Themes paint the picker and its backdrop with `Normal`'s background, which
-	-- under Ghostty is cleared to NONE ('plugin/90_theme_compat.lua') -- so it
-	-- blends into the text behind it. Give the picker a solid tint (the
-	-- theme's `StatusLine` background) and the selected row that tint pushed
-	-- 12% towards the text colour, and keep a fixed black backdrop.
-	local blend = function(a, b, t)
-		local mix = function(shift)
-			local x, y = bit.band(bit.rshift(a, shift), 0xff), bit.band(bit.rshift(b, shift), 0xff)
-			return bit.lshift(math.floor(x + (y - x) * t + 0.5), shift)
-		end
-		return mix(16) + mix(8) + mix(0)
-	end
+	-- The shared float surface ('plugin/90_theme_compat.lua'), plus a fixed
+	-- black backdrop: the theme's one is cleared under Ghostty
 	local set_fzf_highlights = function()
-		local get = function(name)
-			return vim.api.nvim_get_hl(0, { name = name, link = false })
+		-- stylua: ignore
+		local links = {
+			FzfLuaNormal        = "NormalFloat",     FzfLuaBorder        = "FloatBorder",
+			FzfLuaTitle         = "FloatTitle",      FzfLuaCursorLine    = "FloatCursorLine",
+			FzfLuaPreviewNormal = "NormalFloat",     FzfLuaPreviewBorder = "FloatBorder",
+			FzfLuaPreviewTitle  = "FloatTitle",
+		}
+		for group, target in pairs(links) do
+			vim.api.nvim_set_hl(0, group, { link = target })
 		end
-		local fg = get("Normal").fg or (vim.o.background == "light" and 0x000000 or 0xffffff)
-		local tint = get("StatusLine").bg or (vim.o.background == "light" and 0xeeeeee or 0x222222)
-		local set = vim.api.nvim_set_hl
-		set(0, "FzfLuaBackdrop", { bg = "#000000" })
-		set(0, "FzfLuaNormal", { fg = fg, bg = tint })
-		set(0, "FzfLuaBorder", { fg = get("FloatBorder").fg, bg = tint })
-		set(0, "FzfLuaTitle", { fg = fg, bg = tint, bold = true })
-		set(0, "FzfLuaCursorLine", { bg = blend(tint, fg, 0.12) })
-		for _, name in ipairs({ "FzfLuaPreviewNormal", "FzfLuaPreviewBorder", "FzfLuaPreviewTitle" }) do
-			set(0, name, { link = name:gsub("Preview", "") })
-		end
+		vim.api.nvim_set_hl(0, "FzfLuaBackdrop", { bg = "#000000" })
 	end
 	set_fzf_highlights()
-	Config.new_autocmd("ColorScheme", nil, set_fzf_highlights, "Tint fzf picker")
+	Config.new_autocmd("ColorScheme", nil, set_fzf_highlights, "Style fzf picker")
 
 	local nmap_leader = function(suffix, rhs, desc)
 		vim.keymap.set("n", "<Leader>" .. suffix, rhs, { desc = desc })

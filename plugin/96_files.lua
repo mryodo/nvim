@@ -13,8 +13,8 @@ now_if_args(function()
 	require("mini.files").setup({
 		windows = {
 			preview = true,
-			width_focus = math.min(45, math.floor(0.3 * vim.o.columns)),
-			width_nofocus = math.min(30, math.floor(0.18 * vim.o.columns)),
+			width_focus = 30, -- Same as the 'snacks.explorer' card
+			width_nofocus = 20,
 			width_preview = math.min(60, math.floor(0.3 * vim.o.columns)),
 		},
 		options = {
@@ -40,47 +40,24 @@ now_if_args(function()
 		end, { buffer = args.data.buf_id, desc = "Open" })
 	end, "Open mini.files entry on <CR>")
 
-	-- Flip fg/bg for the pane title, same 'reverse' trick as the 'blink.cmp'
-	-- kind icons ('plugin/90_theme_compat.lua'): a highlight is either a link
-	-- or a set of attributes, so the link has to be resolved first before
-	-- adding `reverse`. Mini.files relinks both groups to 'FloatTitle' on
-	-- every 'ColorScheme' event, so this has to redo the flip on that event too.
-	local function reverse_title_highlights()
-		for _, name in ipairs({ "MiniFilesTitle", "MiniFilesTitleFocused" }) do
-			local attrs = vim.api.nvim_get_hl(0, { name = name, link = false })
-			if not attrs.reverse then
-				attrs.reverse = true
-				vim.api.nvim_set_hl(0, name, attrs)
-			end
-		end
-	end
-	reverse_title_highlights()
-	Config.new_autocmd("ColorScheme", nil, reverse_title_highlights, "Flip mini.files title fg/bg")
-
 	-- Dim unfocused columns -----------------------------------------------------
 	local minifiles_windows = {}
 
+	-- Same look as the fzf picker ('plugin/95_fzf.lua' sets the `FzfLua*`
+	-- groups): its tint, border, title and selected row. Unfocused columns
+	-- keep the tint but dim their entries.
 	local function minifiles_winhl(focused)
-		local normal = focused and "MiniFilesNormal" or "MiniFilesNormalInactive"
-		-- Current line uses the same color as a 'changed' hunk mark on the
-		-- 'satellite.nvim' scrollbar ('plugin/91_git.lua'), which links to
-		-- 'gitsigns.nvim's own 'GitSignsChange'.
-		local cursorline = focused and "GitSignsChange" or "CursorLine"
-		local title = focused and "MiniFilesTitleFocused" or "MiniFilesTitle"
-		local files = focused and "MiniFilesFile" or "MiniFilesFileInactive"
-		local dirs = focused and "MiniFilesDirectory" or "MiniFilesFileDirectoryInactive"
-		local border = focused and "MiniFilesBorder" or "MiniFilesBorderInactive"
-
+		local text = focused and "FzfLuaNormal" or "Comment"
 		return table.concat({
-			"Normal:" .. normal,
-			"NormalFloat:" .. normal,
-			"EndOfBuffer:" .. normal,
-			"CursorLine:" .. cursorline,
-			"MiniFilesBorder:" .. border,
-			"FloatBorder:" .. border,
-			"FloatTitle:" .. title,
-			"MiniFilesFile:" .. files,
-			"MiniFilesDirectory:" .. dirs,
+			"Normal:FzfLuaNormal",
+			"NormalFloat:FzfLuaNormal",
+			"EndOfBuffer:FzfLuaNormal",
+			"CursorLine:" .. (focused and "FzfLuaCursorLine" or "FzfLuaNormal"),
+			"MiniFilesBorder:FzfLuaBorder",
+			"FloatBorder:FzfLuaBorder",
+			"FloatTitle:FzfLuaTitle",
+			"MiniFilesFile:" .. text,
+			"MiniFilesDirectory:" .. (focused and "MiniFilesDirectory" or "Comment"),
 		}, ",")
 	end
 
@@ -97,24 +74,15 @@ now_if_args(function()
 		end
 	end
 
-	-- Anchor the columns against the top-left of the editor, full height, snacks.explorer-style.
+	-- Anchor the columns against the top-left of the editor, 40% of the screen
+	-- tall, like the 'snacks.explorer' card ('plugin/94_completion.lua').
 	-- `row`/`col` are otherwise left alone: mini.files already cascades each
 	-- column's `col` from 0 (flush left) based on the cumulative width of the
 	-- columns to its left, so overriding `col` here would stack every column
 	-- on top of the others instead of side by side.
 	local function explorer_height()
-		return vim.o.lines - vim.o.cmdheight - 3 -- leave room for the title row, statusline, cmdline
+		return math.floor(0.4 * vim.o.lines) - 2 -- minus the border
 	end
-
-	-- Like 'snacks.explorer's own sidebar: only the active column gets the
-	-- right-edge separator; every other column is fully borderless so
-	-- adjacent columns blend together instead of each drawing its own line.
-	-- All still reserve a blank top row so `config.title` has somewhere to
-	-- render (an empty top entry hides that row entirely, title and all).
-	-- stylua: ignore
-	local RIGHT_LINE = { "▕", "ToolWindowFloatBorder" }
-	-- stylua: ignore
-	local BOTTOM_PAD = { " ", "ToolWindowFloatBorder" }
 
 	-- mini.files names every one of its buffers 'minifiles://<buf_id>/<fs path>',
 	-- including the preview column (which shows the real file under the
@@ -124,40 +92,13 @@ now_if_args(function()
 		return name:match("^minifiles://%d+/(.*)$")
 	end
 
-	-- The first/last entries in `get_explorer_state().windows` are always the
-	-- leftmost/rightmost columns of the whole explorer (the branch's first and
-	-- last depth), regardless of whether a window id was freshly created or is
-	-- being reused for a new path.
-	local function minifiles_win_edges(win_id)
-		local state = MiniFiles.get_explorer_state()
-		local windows = state and state.windows or {}
-		if #windows == 0 then return true, true end
-		return windows[1].win_id == win_id, windows[#windows].win_id == win_id
-	end
-
-	-- A blank 1-cell margin on the left (only for the leftmost column) and on
-	-- the right (either the active column's separator line, or a blank margin
-	-- if the rightmost column -- e.g. the preview -- isn't the active one).
-	-- Middle columns get neither, so they stay flush against their neighbours
-	-- instead of each clipping a cell off the one next to it.
-	local function minifiles_border(win_id)
-		local is_focused = win_id == vim.api.nvim_get_current_win()
-		local is_leftmost, is_rightmost = minifiles_win_edges(win_id)
-
-		local left = is_leftmost and " " or ""
-		local right = is_focused and RIGHT_LINE or (is_rightmost and " " or "")
-		local bottom = is_focused and BOTTOM_PAD or ""
-
-		return { left, " ", right, right, right, bottom, bottom, left }
-	end
-
 	local function on_window_open(args)
 		local win_id = args.data.win_id
 		minifiles_windows[win_id] = true
 		vim.schedule(update_minifiles_backgrounds)
 
 		local config = vim.api.nvim_win_get_config(win_id)
-		config.title_pos = "center"
+		config.title_pos = "left"
 		vim.api.nvim_win_set_config(win_id, config)
 
 		vim.wo[win_id].winblend = 0
@@ -166,8 +107,14 @@ now_if_args(function()
 
 	local function on_window_update(args)
 		local win_id = args.data.win_id
+		-- mini.files resets its own highlight groups on every update
+		vim.schedule(update_minifiles_backgrounds)
 		local config = vim.api.nvim_win_get_config(win_id)
-		config.border = minifiles_border(win_id)
+		-- Same frame as the fzf picker; every column right of the first gets a
+		-- rule on its left edge ('plugin/90_theme_compat.lua')
+		local state = MiniFiles.get_explorer_state()
+		local first = state and state.windows[1] and state.windows[1].win_id == win_id
+		config.border = first and "solid" or Config.float_border_after
 		config.row = 0
 		config.height = explorer_height()
 
@@ -227,7 +174,7 @@ now_if_args(function()
 			border = "none",
 		})
 
-		vim.wo[win].winblend = 40
+		vim.wo[win].winblend = 60 -- Same dim as the fzf picker's `backdrop`
 		vim.wo[win].winhighlight = "Normal:FzfLuaBackdrop"
 
 		backdrop.buf, backdrop.win = buf, win

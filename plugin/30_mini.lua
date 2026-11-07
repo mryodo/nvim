@@ -24,7 +24,47 @@ end)
 now(function()
 	local ext3_blocklist = { scm = true, txt = true, yml = true }
 	local ext4_blocklist = { json = true, yaml = true }
+	-- LSP kinds as VS Code's codicons: one thin, single-width family instead of
+	-- the default mix. Feeds `Config.kind_icons` below.
+	-- stylua: ignore
+	local codicons = {
+		["text"]          = { glyph = "" },
+		["method"]        = { glyph = "" },
+		["function"]      = { glyph = "" },
+		["constructor"]   = { glyph = "" },
+		["field"]         = { glyph = "" },
+		["variable"]      = { glyph = "" },
+		["class"]         = { glyph = "" },
+		["interface"]     = { glyph = "" },
+		["module"]        = { glyph = "" },
+		["property"]      = { glyph = "" },
+		["unit"]          = { glyph = "" },
+		["value"]         = { glyph = "" },
+		["enum"]          = { glyph = "" },
+		["keyword"]       = { glyph = "" },
+		["snippet"]       = { glyph = "" },
+		["color"]         = { glyph = "" },
+		["file"]          = { glyph = "" },
+		["reference"]     = { glyph = "" },
+		["folder"]        = { glyph = "" },
+		["enummember"]    = { glyph = "" },
+		["constant"]      = { glyph = "" },
+		["struct"]        = { glyph = "" },
+		["event"]         = { glyph = "" },
+		["operator"]      = { glyph = "" },
+		["typeparameter"] = { glyph = "" },
+		["array"]         = { glyph = "" },
+		["boolean"]       = { glyph = "" },
+		["number"]        = { glyph = "" },
+		["string"]        = { glyph = "" },
+		["key"]           = { glyph = "" },
+		["null"]          = { glyph = "" },
+		["object"]        = { glyph = "" },
+		["namespace"]     = { glyph = "" },
+		["package"]       = { glyph = "" },
+	}
 	require("mini.icons").setup({
+		lsp = codicons,
 		use_file_extension = function(ext, _)
 			return not (ext3_blocklist[ext:sub(-3)] or ext4_blocklist[ext:sub(-4)])
 		end,
@@ -32,6 +72,18 @@ now(function()
 	-- Right away, not in `later()`, so plugins asking `nvim-web-devicons` for
 	-- icons during startup already get 'mini.icons'.
 	MiniIcons.mock_nvim_web_devicons()
+
+	-- One glyph per LSP kind, from 'mini.icons', for everything that draws
+	-- kinds: breadcrumb, completion menu, fzf symbols, trouble. Built before
+	-- `tweak_lsp_kind()` rewrites the protocol tables' values (keys stay).
+	Config.kind_icons = {}
+	for _, kinds in ipairs({ vim.lsp.protocol.CompletionItemKind, vim.lsp.protocol.SymbolKind }) do
+		for name in pairs(kinds) do
+			if type(name) == "string" then
+				Config.kind_icons[name] = MiniIcons.get("lsp", name:lower())
+			end
+		end
+	end
 	later(MiniIcons.tweak_lsp_kind)
 end)
 

@@ -101,7 +101,7 @@ vim.o.termsync        = true                    -- Batch each redraw into one at
 vim.o.pumblend        = 0                       -- No pseudo-transparency: blended cells are recomposited on every redraw
 vim.o.winblend        = 0
 vim.o.title           = true                    -- Put file name and path in window title
-vim.o.winborder       = 'rounded'                -- Use border in floating windows
+vim.o.winborder       = 'solid'                  -- Floats: tint padding, no drawn lines
 
 -- Command line. 'blink.cmp' completes `:` commands (see 'plugin/94_completion.lua'),
 -- so the built-in 'wildmenu' would only draw a second, worse menu underneath it.
@@ -110,7 +110,7 @@ vim.o.wildmode        = ''
 vim.o.more            = false                   -- Never page long output with the "-- More --" prompt
 
 -- Popup menu (built-in completion and 'blink.cmp')
-vim.o.pumborder       = 'rounded'
+vim.o.pumborder       = 'solid'
 vim.o.pumheight       = 10                      -- Make popup menu smaller
 vim.o.pummaxwidth     = 100                     -- Make popup menu not too wide
 vim.o.pumwidth        = 30                      -- Make popup menu not too narrow
@@ -133,7 +133,7 @@ vim.g.nerd_font_is_present = true
 -- Folds (see `:h fold-commands`, `:h zM`, `:h zR`, `:h zA`, `:h zj`) =========
 vim.o.foldmethod      = 'expr'
 vim.o.foldexpr        = 'v:lua.vim.treesitter.foldexpr()'
-vim.o.foldtext        = ''                      -- Show text under fold with its highlighting
+vim.o.foldtext        = 'v:lua.Config.foldtext()' -- Highlighted first line + line count (below)
 vim.o.foldcolumn      = '0'
 vim.o.foldenable      = true
 vim.o.foldlevel       = 99                      -- Fold nothing by default
@@ -172,6 +172,45 @@ vim.o.formatlistpat   = [[^\s*[0-9\-\+\*]\+[\.\)]*\s\+]]
 vim.o.completeopt     = ''
 vim.o.completetimeout = 100                     -- Limit sources delay
 -- stylua: ignore end
+
+-- Fold summary: the first line with its tree-sitter highlighting (what an empty
+-- 'foldtext' shows), then a dim "⋯ 12 lines" badge.
+Config.foldtext = function()
+	local start = vim.v.foldstart
+	local line = vim.api.nvim_buf_get_lines(0, start - 1, start, false)[1]
+	local spaces = string.rep(" ", vim.bo.tabstop)
+	local chunks, col = {}, 0
+	local add = function(text, hl)
+		table.insert(chunks, { (text:gsub("\t", spaces)), hl })
+	end
+
+	local ok, parser = pcall(vim.treesitter.get_parser, 0)
+	local query = ok and parser and vim.treesitter.query.get(parser:lang(), "highlights")
+	if query then
+		local tree = parser:parse({ start - 1, start })[1]
+		local last_scol, last_ecol
+		for id, node in query:iter_captures(tree:root(), 0, start - 1, start) do
+			local srow, scol, erow, ecol = node:range()
+			local hl = "@" .. query.captures[id]
+			if srow == start - 1 and erow == start - 1 then
+				if scol == last_scol and ecol == last_ecol then
+					chunks[#chunks][2] = hl -- Same node again: the later capture wins
+				elseif scol >= col then
+					if scol > col then
+						add(line:sub(col + 1, scol), "Normal")
+					end
+					add(line:sub(scol + 1, ecol), hl)
+					col, last_scol, last_ecol = ecol, scol, ecol
+				end
+			end
+		end
+	end
+	if col < #line then
+		add(line:sub(col + 1), "Normal")
+	end
+	table.insert(chunks, { "  ⋯ " .. (vim.v.foldend - start) .. " lines", "Comment" })
+	return chunks
+end
 
 -- Autocommands ===============================================================
 
@@ -223,7 +262,6 @@ local diagnostic_opts = {
 	virtual_lines = false,
 
 	float = {
-		border = "rounded",
 		source = "if_many",
 		header = "",
 		prefix = "",

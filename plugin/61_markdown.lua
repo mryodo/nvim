@@ -22,6 +22,8 @@ later(function()
 	})
 	local presets = require("markview.presets")
 	require("markview").setup({
+		-- Also render 'nofile' markdown: LSP hover and signature help windows
+		preview = { ignore_buftypes = {} },
 		markdown_inline = {
 			checkboxes = {
 				enable = false,

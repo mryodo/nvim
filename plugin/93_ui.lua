@@ -59,7 +59,9 @@ later(function()
 		"https://github.com/mryodo/rwth.nvim",
 	})
 
-	require("rwth").setup({ transparent = false })
+	-- `minifilesstyle` would re-run `mini.files` setup with its own look on top of
+	-- 'plugin/96_files.lua'
+	require("rwth").setup({ transparent = false, minifilesstyle = false })
 
 	-- 'circadia' nests its Neovim port under 'ports/neovim' rather than the
 	-- plugin root, so its `lua/circadia` module is invisible to the native
@@ -95,7 +97,7 @@ now(function()
 	-- Active scheme: 'koda-dark' / 'koda-glade'.
 	-- `\b` still toggles 'background' and syncs Kitty.
 	--
-	-- 'jb.nvim' stays installed: `jb.icons` and `jb.borders` are used across
+	-- 'jb.nvim' stays installed: `jb.borders` is used across
 	-- this config and `:colorscheme jb` still works. The JetBrains-specific
 	-- highlight groups it would otherwise define (dialog and tool-window
 	-- borders, `JBIcon*`, the statusline groups) are bridged to standard ones
@@ -209,13 +211,19 @@ now(function()
 end)
 
 -- In-window decorations ======================================================
--- Deferred: none of this is needed to paint the first buffer, and
--- 'nvim-treesitter-context' below is off by default anyway.
+-- Deferred: none of this is needed to paint the first buffer.
 later(function()
+	-- Terminals on the float tint, marking them as tool panes
+	local tint_terminal = function()
+		vim.wo.winhighlight = "Normal:NormalFloat"
+	end
+	Config.new_autocmd({ "TermOpen", "BufWinEnter" }, "term://*", tint_terminal, "Tint terminal windows")
+
 	add({ "https://github.com/lukas-reineke/indent-blankline.nvim" })
 	require("ibl").setup({
-		indent = { char = "▏", tab_char = "▏" },
-		scope = { char = "▏", show_start = false, show_end = false },
+		-- Groups defined in 'plugin/90_theme_compat.lua'
+		indent = { char = "▏", tab_char = "▏", highlight = "IndentFaint" },
+		scope = { char = "▏", show_start = false, show_end = false, highlight = "IndentScope" },
 	})
 
 	add({ "https://github.com/nvim-treesitter/nvim-treesitter-textobjects" })
@@ -224,20 +232,19 @@ later(function()
 		move = { set_jumps = true },
 	})
 
-	-- Disabled by default; toggle with `:TSContextToggle`
+	-- Sticky scroll: the enclosing scopes stay pinned on the float tint
+	-- ('plugin/90_theme_compat.lua'). Toggle with `:TSContextToggle`.
 	add({ "https://github.com/nvim-treesitter/nvim-treesitter-context" })
 	require("treesitter-context").setup({
-		enable = false,
+		enable = true,
 		multiwindow = false,
-		max_lines = 5,
-		min_window_height = 0,
+		max_lines = 3,
+		min_window_height = 20,
 		line_numbers = true,
 		multiline_threshold = 1,
 		trim_scope = "outer",
 		mode = "topline",
-		separator = "-",
 		zindex = 20,
-		on_attach = nil,
 	})
 end)
 
@@ -247,8 +254,26 @@ later(function()
 	add({ "https://github.com/folke/which-key.nvim" })
 	local wk = require("which-key")
 	wk.setup({ preset = "helix" })
+	-- Codicons per group, tinted with the 'mini.icons' palette
+	-- stylua: ignore
+	local group_icons = {
+		["AI"]           = { icon = "\u{ec10}", color = "purple" },
+		["Buffer"]       = { icon = "\u{eaf0}", color = "cyan" },
+		["Session"]      = { icon = "\u{eb49}", color = "azure" },
+		["Explore/Edit"] = { icon = "\u{eaf7}", color = "yellow" },
+		["Find"]         = { icon = "\u{ea6d}", color = "green" },
+		["Git"]          = { icon = "\u{ea68}", color = "orange" },
+		["Julia REPL"]   = { icon = "\u{eb9b}", color = "purple" },
+		["Language"]     = { icon = "\u{eac4}", color = "azure" },
+		["Other"]        = { icon = "\u{ea7c}", color = "grey" },
+		["Run cell"]     = { icon = "\u{eb2c}", color = "green" },
+		["Terminal"]     = { icon = "\u{ea85}", color = "red" },
+		["Visits"]       = { icon = "\u{ea82}", color = "cyan" },
+		["Todo"]         = { icon = "\u{eab3}", color = "yellow" },
+	}
 	for _, clue in ipairs(Config.leader_group_clues) do
-		wk.add({ clue.keys, group = clue.desc:sub(2), mode = clue.mode })
+		local group = clue.desc:sub(2)
+		wk.add({ clue.keys, group = group, mode = clue.mode, icon = group_icons[group] })
 	end
 
 	add({ "https://github.com/folke/zen-mode.nvim" })
@@ -260,6 +285,30 @@ later(function()
 			options = { cursorline = true },
 		},
 	})
+
+	-- Prose opens centred. Only for a real file alone on screen, so hover and
+	-- preview floats (also 'markdown') and existing splits are left alone.
+	local prose_zen = function(args)
+		vim.schedule(function()
+			local win = vim.api.nvim_get_current_win()
+			if vim.bo[args.buf].buftype ~= "" or vim.api.nvim_win_get_buf(win) ~= args.buf then
+				return
+			end
+			local splits = vim.tbl_filter(function(w)
+				return vim.api.nvim_win_get_config(w).relative == ""
+			end, vim.api.nvim_tabpage_list_wins(0))
+			if vim.api.nvim_win_get_config(win).relative ~= "" or #splits > 1 then
+				return
+			end
+			require("zen-mode").open()
+		end)
+	end
+	local prose = { "markdown", "tex", "typst" }
+	Config.new_autocmd("FileType", prose, prose_zen, "Centre prose with zen-mode")
+	-- A file given on the command line got its `FileType` before this ran
+	if vim.tbl_contains(prose, vim.bo.filetype) then
+		prose_zen({ buf = vim.api.nvim_get_current_buf() })
+	end
 end)
 
 -- Messages and notifications =================================================
@@ -275,8 +324,8 @@ later(function()
 			view = { group_separator = "───" },
 			window = {
 				winblend = 0,
-				border = "rounded",
-				normal_hl = "Comment",
+				border = "solid",
+				normal_hl = "NormalFloat", -- The shared float tint
 				x_padding = 1,
 			},
 		},

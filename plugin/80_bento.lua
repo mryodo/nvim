@@ -21,6 +21,7 @@ later(function()
 	require("bento").setup({
 		highlights = {
 			previous = "BentoNormal",
+			window_bg = "NormalFloat", -- The shared float tint
 		},
 	})
 

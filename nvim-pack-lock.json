@@ -240,6 +240,10 @@
       "rev": "17f1e5d664bc615478230dc0240666329efacf9b",
       "src": "https://github.com/quarto-dev/quarto-nvim"
     },
+    "quicker.nvim": {
+      "rev": "4a6883cb13fe097a20a046eb55f6dffd239276e3",
+      "src": "https://github.com/stevearc/quicker.nvim"
+    },
     "rwth.nvim": {
       "rev": "2665399ef0f12b2b1b2005fba17f13f4896e31b7",
       "src": "https://github.com/mryodo/rwth.nvim"

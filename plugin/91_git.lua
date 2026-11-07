@@ -24,8 +24,31 @@ later(function()
 		},
 	})
 
+	-- Quickfix/location lists with icons, aligned columns and highlighted
+	-- lines; editable like a buffer (`:w` applies the changes)
+	add({ "https://github.com/stevearc/quicker.nvim" })
+	require("quicker").setup()
+
 	add({ "https://github.com/kevinhwang91/nvim-hlslens" })
-	require("hlslens").setup()
+	-- Match counts as barely-visible text: the nearest match reads "3/9", the
+	-- others their index and how many `n`/`N` away they are ("↓2 5").
+	-- Colours in 'plugin/90_theme_compat.lua'.
+	require("hlslens").setup({
+		override_lens = function(render, pos_list, nearest, idx, rel_idx)
+			local forward = vim.v.searchforward == 1
+			local steps = math.abs(rel_idx)
+			local arrow = (forward ~= (rel_idx > 0)) and "↑" or "↓"
+			local hl, text
+			if nearest then
+				hl, text = "HlSearchLensNear", ("%d/%d"):format(idx, #pos_list)
+			else
+				hl, text = "HlSearchLens", (steps > 1 and arrow .. steps or arrow) .. " " .. idx
+			end
+			local lnum, col = unpack(pos_list[idx])
+			local chunks = { { "  " }, { text, hl } }
+			render.setVirt(0, lnum - 1, col - 1, chunks, nearest)
+		end,
+	})
 
 	add({ "https://github.com/lewis6991/gitsigns.nvim" })
 	require("gitsigns").setup({
@@ -63,7 +86,7 @@ later(function()
 		current_line_blame_formatter = "<author>, <author_time:%m/%d/%y>, <author_time:%I:%M %p> · <summary>",
 		preview_config = {
 			-- Options passed to nvim_open_win
-			border = "rounded",
+			border = "solid",
 			style = "minimal",
 			relative = "cursor",
 			row = 0,

@@ -84,7 +84,7 @@ later(function()
 		format_text = format_text,
 		icons = vim.tbl_map(function(icon)
 			return icon ~= "" and icon .. " " or ""
-		end, require("jb.icons").kind),
+		end, Config.kind_icons),
 	})
 
 	-- `auto_attach` is an |LspAttach| autocommand, and `later()` can run after a
@@ -173,16 +173,6 @@ later(function()
 	end
 
 	-- stylua: ignore
-	local short_mode = {
-		["NORMAL"]    = "NO", ["O-PENDING"] = "OP", ["VISUAL"]  = "VI",
-		["V-LINE"]    = "VL", ["V-BLOCK"]   = "VB", ["SELECT"]  = "SE",
-		["S-LINE"]    = "SL", ["S-BLOCK"]   = "SB", ["INSERT"]  = "IN",
-		["REPLACE"]   = "RE", ["V-REPLACE"] = "VR", ["COMMAND"] = "CL",
-		["EX"]        = "Ex", ["MORE"]      = "MO", ["CONFIRM"] = "??",
-		["SHELL"]     = "Sh", ["TERMINAL"]  = "TE",
-	}
-
-	-- stylua: ignore
 	local mode_icons = {
 		["NORMAL"]    = "", ["O-PENDING"] = "", ["VISUAL"]  = "",
 		["V-LINE"]    = "", ["V-BLOCK"]   = "", ["SELECT"]  = "",
@@ -254,6 +244,13 @@ later(function()
 		return mode_colors[(vim.fn.mode(1) or "n"):sub(1, 1)] or palette.fg
 	end
 
+	-- The cursor's line number takes the mode colour too
+	local function paint_cursor_line_nr()
+		vim.api.nvim_set_hl(0, "CursorLineNr", { fg = mode_color(), bold = true })
+	end
+	paint_cursor_line_nr()
+	Config.new_autocmd({ "ModeChanged", "ColorScheme" }, nil, paint_cursor_line_nr, "Colour cursor line number by mode")
+
 	--- Filled block: the mode colour as a background.
 	local function primary()
 		return { bg = mode_color(), fg = palette.black, gui = "bold" }
@@ -265,26 +262,27 @@ later(function()
 		return { fg = color == palette.fg and palette.dark_gray or color }
 	end
 
-	--- Attached language servers, e.g. " lua_ls"
+	--- Attached language servers, after the codicon "server" glyph
 	local function lsp_clients()
 		local names = {}
 		for _, client in ipairs(vim.lsp.get_clients({ bufnr = 0 })) do
 			table.insert(names, client.name)
 		end
-		return #names > 0 and ("\u{f013} " .. table.concat(names, " ")) or ""
+		return #names > 0 and ("\u{eb50} " .. table.concat(names, " ")) or ""
 	end
 
-	-- The same glyphs 'incline' puts in its badges ('plugin/93_ui.lua')
-	local jb_diagnostic = require("jb.icons").diagnostic
+	-- The glyphs the diagnostic signs used before they became line numbers
+	-- Coloured icon, faint count: the count follows the symbol in the
+	-- component's output, so the symbol ends by switching to `FaintText`
 	local diagnostic_symbols = {
-		error = jb_diagnostic[1] .. " ",
-		warn = jb_diagnostic[2] .. " ",
-		info = jb_diagnostic[3] .. " ",
-		hint = jb_diagnostic[4] .. " ",
+		error = "%#DiagnosticError#\u{f015a} %#FaintText#",
+		warn = "%#DiagnosticWarn#\u{f002a} %#FaintText#",
+		info = "%#DiagnosticInfo#\u{f02fd} %#FaintText#",
+		hint = "%#DiagnosticHint#\u{f0336} %#FaintText#",
 	}
 
 	local function clock()
-		return "  " .. os.date("%Hh%M") .. " "
+		return "  " .. os.date("%H:%M") .. " "
 	end
 
 	-- Sections are coloured per component, so the theme only has to keep the
@@ -322,7 +320,7 @@ later(function()
 				{
 					"mode",
 					fmt = function(mode)
-						return (mode_icons[mode] or "") .. " " .. (short_mode[mode] or mode)
+						return (mode_icons[mode] or "") .. " " .. mode
 					end,
 					color = primary,
 					padding = { left = 1, right = 1 },
@@ -348,6 +346,9 @@ later(function()
 				{
 					"lsp_progress",
 					color = secondary,
+					-- Spinner and percentage only: the server name is already
+					-- listed right next to it
+					display_components = { "spinner", { "percentage" } },
 					-- The component already writes its percentage sign as `%%`,
 					-- which the escape below would double into a literal `%%`.
 					separators = { percentage = { pre = "", post = "% " } },
@@ -398,13 +399,19 @@ later(function()
 		local focused = win == vim.api.nvim_get_current_win()
 		local base = focused and "%#WinBar#" or "%#WinBarNC#"
 
-		local name = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(buf), ":t")
+		local path = vim.api.nvim_buf_get_name(buf)
+		local name = vim.fn.fnamemodify(path, ":t")
 		local icon, icon_hl = MiniIcons.get("file", name)
+		-- Parent folder, relative to the working directory, dimmed
+		local dir = vim.fn.fnamemodify(path, ":~:.:h")
+		dir = dir == "." and "" or (#dir > 30 and vim.fn.pathshorten(dir) or dir) .. "/"
 		local parts = {
 			" ",
 			focused and ("%#" .. icon_hl .. "#") or base,
 			icon,
 			" ",
+			"%#Comment#",
+			dir:gsub("%%", "%%%%"),
 			focused and "%#WinBarFile#" or base,
 			name:gsub("%%", "%%%%"),
 			vim.bo[buf].modified and " ●" or "",
@@ -437,7 +444,9 @@ later(function()
 		for _, part in ipairs(diff_parts) do
 			local n = tonumber(signs[part.key])
 			if n ~= nil and n > 0 then
-				table.insert(parts, (focused and ("%#" .. part.group .. "#") or base) .. part.icon .. n .. " ")
+				-- Coloured sign, faint number
+				local sign = focused and ("%#" .. part.group .. "#") or base
+				table.insert(parts, sign .. part.icon .. (focused and "%#FaintText#" or "") .. n .. " ")
 			end
 		end
 		return table.concat(parts)

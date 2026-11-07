@@ -126,24 +126,7 @@ now(function()
 		return ctx.line:sub(1, ctx.bounds.start_col - 1):sub(-1) == "@"
 	end
 
-	-- Menu styling mirrors 'test-nvim', which draws the kind column with
-	-- 'lspkind' in `symbol` mode. Its `symbol_map` overrides every entry of the
-	-- `codicons` preset, so the table below is that map copied verbatim rather
-	-- than a call to `lspkind.init()`: that rewrites
-	-- `vim.lsp.protocol.CompletionItemKind` in place and would undo
-	-- `MiniIcons.tweak_lsp_kind()` ('plugin/30_mini.lua'). `jb.icons` (still used
-	-- by 'nvim-navic' and 'fzf-lua') draws JetBrains-style square glyphs, which
-	-- do not read well at the narrow kind column width.
-	-- stylua: ignore
-	local kind_icons = {
-		Text          = "", Method        = "", Function      = "", Constructor   = "",
-		Field         = "", Variable      = "", Class         = "", Interface     = "",
-		Module        = "", Property      = "", Unit          = "", Value         = "",
-		Enum          = "", Keyword       = "", Snippet       = "", Color         = "",
-		File          = "", Reference     = "", Folder        = "", EnumMember    = "",
-		Constant      = "", Struct        = "", Event         = "", Operator      = "",
-		TypeParameter = "", Copilot       = "",
-	}
+	-- Kind glyphs come from 'mini.icons' (`Config.kind_icons`, 'plugin/30_mini.lua')
 
 	--- Kind column: one space of padding either side, and `path` items get the
 	--- devicon for the file they point at instead of a generic file glyph.
@@ -236,10 +219,15 @@ now(function()
 			documentation = {
 				auto_show = true,
 				auto_show_delay_ms = 400,
-				window = { border = "rounded" },
+				-- Always right of the menu, so the rule on its left edge
+				-- ('plugin/90_theme_compat.lua') sits between the two
+				window = {
+					border = Config.float_border_after,
+					direction_priority = { menu_north = { "e" }, menu_south = { "e" } },
+				},
 			},
 			menu = {
-				border = "rounded",
+				border = "solid",
 				auto_show = true,
 				-- Don't build and paint the menu on every keystroke of a burst,
 				-- but short enough that it still feels instant on a pause.
@@ -459,8 +447,11 @@ now(function()
 			sorts = { "score", "sort_text" },
 		},
 
+		-- Parameters of the call under the cursor, current one highlighted
+		signature = { enabled = true, window = { border = "solid" } },
+
 		appearance = {
-			kind_icons = kind_icons,
+			kind_icons = Config.kind_icons,
 			nerd_font_variant = "mono",
 		},
 	})
@@ -626,23 +617,14 @@ later(function()
 							preview = "main",
 							layout = {
 								backdrop = false,
-								width = 40,
-								min_width = 40,
-								height = 0,
-								col = 0,
+								-- Floating card in the top-left corner
+								width = 30,
+								min_width = 30,
+								height = 0.4,
 								row = 0,
+								col = 0,
 								position = "float",
-								-- border = "none",
-								border = {
-									"",
-									"",
-									{ "▕", "ToolWindowFloatBorder" },
-									{ "▕", "ToolWindowFloatBorder" },
-									{ "▕", "ToolWindowFloatBorder" },
-									{ " ", "ToolWindowFloatBorder" },
-									{ " ", "ToolWindowFloatBorder" },
-									"",
-								},
+								border = "solid", -- Same frame as the fzf picker
 								box = "vertical",
 								{
 									box = "vertical",
@@ -709,6 +691,25 @@ later(function()
 			},
 		},
 	})
+
+	-- Pickers look like the fzf one: its tint, border, title and selected row
+	-- ('plugin/95_fzf.lua' sets the `FzfLua*` groups on every colour scheme)
+	local link_snacks_to_fzf = function()
+		-- stylua: ignore
+		local links = {
+			SnacksPicker               = "FzfLuaNormal",
+			SnacksPickerBorder         = "FzfLuaBorder",
+			SnacksPickerTitle          = "FzfLuaTitle",
+			SnacksPickerCursorLine     = "FzfLuaCursorLine",
+			SnacksPickerListCursorLine = "FzfLuaCursorLine",
+			SnacksPickerBackdrop       = "FzfLuaBackdrop",
+		}
+		for group, target in pairs(links) do
+			vim.api.nvim_set_hl(0, group, { link = target })
+		end
+	end
+	link_snacks_to_fzf()
+	Config.new_autocmd("ColorScheme", nil, link_snacks_to_fzf, "Style snacks pickers like fzf")
 
 	vim.keymap.set("n", "<leader>oe", require("netrw").toggle_vim_explorer_float, {
 		desc = "Project: [o]pen netrw [e]xplorer window.",
@@ -825,7 +826,7 @@ later(function()
 			},
 		},
 	}
-	opts.icons = { kinds = require("jb.icons").kind }
+	opts.icons = { kinds = vim.tbl_map(function(icon) return icon .. " " end, Config.kind_icons) }
 	trouble.setup(opts)
 
 	vim.keymap.set("n", "]p", function()

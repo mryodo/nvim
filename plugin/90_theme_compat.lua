@@ -111,6 +111,116 @@ local reverse_blink_kinds = function()
 	end
 end
 
+--- Mix two 0xRRGGBB colours: `t = 0` is `a`, `t = 1` is `b`
+local blend = function(a, b, t)
+	local mix = function(shift)
+		local x, y = bit.band(bit.rshift(a, shift), 0xff), bit.band(bit.rshift(b, shift), 0xff)
+		return bit.lshift(math.floor(x + (y - x) * t + 0.5), shift)
+	end
+	return mix(16) + mix(8) + mix(0)
+end
+
+--- One tinted surface for every floating window -- pickers, completion, hover,
+--- diagnostics, which-key, notifications -- so none of them blends into the
+--- text behind it. Themes give floats `Normal`'s background, which Ghostty
+--- clears to NONE (see below). The tint is the theme's `StatusLine`
+--- background; the selected row is that tint pushed towards the text colour.
+--- Border for a float that sits right of another one (a picker's preview, a
+--- mini.files column): the usual tint padding, plus a faint vertical rule on
+--- the left edge so the two read as separate panes.
+local sep = { "│", "FloatSeparator" }
+Config.float_border_after = { sep, " ", " ", " ", " ", " ", sep, sep }
+
+local apply_surfaces = function()
+	local get = function(name)
+		return vim.api.nvim_get_hl(0, { name = name, link = false })
+	end
+	local set = vim.api.nvim_set_hl
+	local light = vim.o.background == "light"
+	local normal = get("Normal")
+	local fg = normal.fg or (light and 0x000000 or 0xd0d0d0)
+	local bg = normal.bg or (light and 0xffffff or 0x101010)
+	local tint = get("StatusLine").bg or blend(bg, fg, 0.08)
+	local comment = get("Comment").fg or blend(bg, fg, 0.5)
+	local nontext = get("NonText").fg or comment
+	local warn = get("DiagnosticWarn").fg or comment
+	local selected = blend(tint, fg, 0.12)
+
+	set(0, "NormalFloat", { fg = fg, bg = tint })
+	set(0, "FloatBorder", { fg = get("FloatBorder").fg or comment, bg = tint })
+	set(0, "FloatTitle", { fg = fg, bg = tint, bold = true })
+	set(0, "FloatCursorLine", { bg = selected })
+	set(0, "FloatSeparator", { fg = blend(tint, fg, 0.25), bg = tint })
+	set(0, "Pmenu", { fg = fg, bg = tint })
+	set(0, "PmenuSel", { bg = selected, bold = true })
+	set(0, "PmenuSbar", { bg = tint })
+	set(0, "PmenuThumb", { bg = comment })
+
+	-- Inactive windows: plain text pushed a third of the way to the background
+	set(0, "NormalNC", { fg = blend(fg, bg, 0.35) })
+
+	-- Sticky scroll ('nvim-treesitter-context', 'plugin/93_ui.lua'), with a
+	-- faint rule under the last pinned line
+	set(0, "TreesitterContext", { bg = tint })
+	set(0, "TreesitterContextLineNumber", { fg = comment, bg = tint })
+	set(0, "TreesitterContextBottom", { underline = true, sp = comment })
+	set(0, "TreesitterContextLineNumberBottom", { underline = true, sp = comment })
+
+	-- Selection on the float tint; search matches in a muted accent, the
+	-- current one stronger
+	set(0, "Visual", { bg = selected })
+	set(0, "Search", { fg = fg, bg = blend(bg, warn, 0.25) })
+	set(0, "CurSearch", { fg = fg, bg = blend(bg, warn, 0.5), bold = true })
+	set(0, "IncSearch", { link = "CurSearch" })
+	-- Secondary numbers (winbar diffstat, statusline diagnostic counts) next
+	-- to a coloured sign
+	set(0, "FaintText", { fg = blend(bg, fg, 0.3) })
+
+	-- Scrollbar marks ('satellite.nvim') at half strength
+	for _, kind in ipairs({ "Error", "Warn", "Info", "Hint" }) do
+		set(0, "SatelliteDiagnostic" .. kind, { fg = blend(bg, get("Diagnostic" .. kind).fg or comment, 0.5) })
+	end
+	for _, kind in ipairs({ "Add", "Change", "Delete" }) do
+		set(0, "SatelliteGitSigns" .. kind, { fg = blend(bg, get("GitSigns" .. kind).fg or comment, 0.5) })
+	end
+	set(0, "SatelliteSearch", { fg = blend(bg, warn, 0.5) })
+	set(0, "SatelliteSearchCurrent", { fg = blend(bg, warn, 0.8) })
+
+	-- Code lenses ('plugin/40_lsp.lua'): faint italic lines above definitions
+	set(0, "LspCodeLens", { fg = blend(bg, fg, 0.3), italic = true })
+	set(0, "LspCodeLensSeparator", { link = "LspCodeLens" })
+
+	-- Match counts ('nvim-hlslens') barely there, the nearest a shade less so
+	set(0, "HlSearchLens", { fg = blend(bg, fg, 0.18) })
+	set(0, "HlSearchLensNear", { fg = blend(bg, fg, 0.3) })
+
+	-- Faint relative numbers and invisible-character markers, so the
+	-- mode-coloured current number ('plugin/92_statusline.lua') stands out
+	set(0, "LineNr", { fg = blend(bg, comment, 0.6) })
+	set(0, "LineNrAbove", { link = "LineNr" })
+	set(0, "LineNrBelow", { link = "LineNr" })
+	set(0, "NonText", { fg = blend(bg, nontext, 0.7) })
+
+	-- Inlay hints as faint pills: annotation, not code
+	set(0, "LspInlayHint", { fg = comment, bg = tint, italic = true })
+
+	-- Matching bracket: bold and underlined instead of a filled block
+	set(0, "MatchParen", { bold = true, underline = true })
+
+	-- Indent guides ('plugin/93_ui.lua'): every level barely there, the
+	-- current scope in the comment colour
+	set(0, "IndentFaint", { fg = blend(bg, nontext, 0.5) })
+	set(0, "IndentScope", { fg = comment })
+
+	-- Start screen ('plugin/30_mini.lua')
+	set(0, "MiniStarterHeader", { fg = fg, bold = true })
+	set(0, "MiniStarterSection", { fg = comment, bold = true })
+	set(0, "MiniStarterItemPrefix", { link = "DiagnosticHint" })
+	set(0, "MiniStarterQuery", { link = "DiagnosticWarn" })
+	set(0, "MiniStarterItemBullet", { link = "NonText" })
+	set(0, "MiniStarterFooter", { link = "Comment" })
+end
+
 local apply = function()
 	for group, target in pairs(links) do
 		vim.api.nvim_set_hl(0, group, { link = target, default = true })
@@ -131,8 +241,9 @@ local apply = function()
 	vim.api.nvim_set_hl(0, "WinBarFile", { fg = normal_fg, bold = true })
 	vim.api.nvim_set_hl(0, "WinBarNC", { link = "Comment" })
 	-- Status line ('plugin/92_statusline.lua') on the editor background, like
-	-- the winbar. `StatusLine` itself keeps its tint: the fzf picker uses it.
+	-- the winbar. `StatusLine` itself keeps its tint: floats are painted with it.
 	vim.api.nvim_set_hl(0, "StatusLineClear", { fg = normal_fg })
+	apply_surfaces()
 end
 
 Config.new_autocmd("ColorScheme", nil, apply, "Fill in jb.nvim-specific highlight groups")

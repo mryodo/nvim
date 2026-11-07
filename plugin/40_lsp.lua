@@ -198,11 +198,24 @@ end)
 
 -- Diagnostics display ========================================================
 later(function()
-	-- Faint parameter/type hints inline, for every server that offers them
-	vim.lsp.inlay_hint.enable(true)
+	-- Faint parameter/type hints inline, for every server that offers them.
+	-- Off by default; `\H` toggles.
+	vim.keymap.set("n", "\\H", function()
+		vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+	end, { desc = "Toggle inlay hints" })
+
+	-- Reference counts and similar lenses above definitions, for servers
+	-- that offer them; `<Leader>ll` runs the one under the cursor.
+	-- Off by default; `\L` toggles.
+	vim.keymap.set("n", "\\L", function()
+		vim.lsp.codelens.enable(not vim.lsp.codelens.is_enabled())
+	end, { desc = "Toggle code lenses" })
 
 	add({ "https://github.com/rachartier/tiny-inline-diagnostic.nvim" })
 	require("tiny-inline-diagnostic").setup({
+		preset = "modern",
+		-- Pills on the shared float tint ('plugin/90_theme_compat.lua')
+		hi = { background = "NormalFloat" },
 		options = {
 			show_source = { enabled = true },
 			add_messages = { display_count = true },

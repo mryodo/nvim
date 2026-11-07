@@ -19,8 +19,9 @@ local function open_lazygit()
 		row = math.floor((height - win_height) / 2),
 		col = math.floor((width - win_width) / 2),
 		style = "minimal",
-		border = "rounded",
+		border = "solid",
 	})
+	vim.wo[win].winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder"
 
 	-- Start lazygit (fresh every time)
 	vim.fn.jobstart("lazygit", {
