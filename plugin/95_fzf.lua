@@ -15,17 +15,18 @@ later(function()
 
 	local opts = {
 		winopts = {
-			backdrop = 40,
+			backdrop = 60,
 
-			height = 35, -- window height
-			width = 65,
-			row = 0.65,
+			-- Full-width panel docked to the bottom of the screen
+			height = 0.45,
+			width = 1,
+			row = 1,
 			zindex = 100,
 			preview = {
 				title_pos = "left",
 				scrollbar = false,
-				layout = "vertical",
-				vertical = "down:40%",
+				layout = "horizontal",
+				horizontal = "right:50%",
 				winopts = {},
 			},
 		},
@@ -35,7 +36,8 @@ later(function()
 			--   tags, btags, args, buffers, tabs, lines, blines
 			files = { true },
 		},
-		fzf_colors = true,
+		-- Colours come from the theme's highlights, with the tint set below
+		fzf_colors = { true, gutter = { "bg", "FzfLuaNormal" } },
 		fzf_opts = {
 			["--layout"] = "reverse",
 			["--separator"] = "‾",
@@ -43,9 +45,6 @@ later(function()
 		defaults = {
 			winopts = {
 				title_pos = "left",
-				height = 35, -- window height
-				width = 65,
-				row = 0.65,
 				preview = {
 					winopts = {},
 				},
@@ -57,9 +56,6 @@ later(function()
 		files = {
 			winopts = {
 				title = " Files ",
-				height = 35, -- window height
-				width = 65,
-				row = 0.65,
 			},
 			prompt = "   ",
 			formatter = "path.dirname_first",
@@ -78,9 +74,6 @@ later(function()
 		grep = {
 			winopts = {
 				title = " Find in Files ",
-				height = 35, -- window height
-				width = 65,
-				row = 0.65,
 			},
 			prompt = "   ",
 			previewer = "builtin",
@@ -123,18 +116,46 @@ later(function()
 	opts.buffers.actions = opts.buffers.actions or {}
 	opts.buffers.actions["alt-backspace"] = { fn = actions.buf_del, reload = true }
 
-	local split_top_shadowed = require("jb.borders").borders.dialog.default_box_split_top_shadowed
-	local split_bottom_shadowed = require("jb.borders").borders.dialog.default_box_split_bottom_shadowed
-	local header_shadowed = require("jb.borders").borders.dialog.default_box_header_shadowed
 	local icons = require("jb.icons")
 
-	opts.defaults.winopts.border = split_top_shadowed
-	opts.defaults.winopts.preview.border = split_bottom_shadowed
-	opts.buffers.winopts.border = header_shadowed
+	-- Plain borders, matching 'winborder' ('plugin/10_options.lua')
+	opts.winopts.border = "rounded"
+	opts.winopts.preview.border = "rounded"
 
 	opts.lsp.symbols.symbol_icons = icons.kind
 
 	require("fzf-lua").setup(opts)
+
+	-- Themes paint the picker and its backdrop with `Normal`'s background, which
+	-- under Ghostty is cleared to NONE ('plugin/90_theme_compat.lua') -- so it
+	-- blends into the text behind it. Give the picker a solid tint (the
+	-- theme's `StatusLine` background) and the selected row that tint pushed
+	-- 12% towards the text colour, and keep a fixed black backdrop.
+	local blend = function(a, b, t)
+		local mix = function(shift)
+			local x, y = bit.band(bit.rshift(a, shift), 0xff), bit.band(bit.rshift(b, shift), 0xff)
+			return bit.lshift(math.floor(x + (y - x) * t + 0.5), shift)
+		end
+		return mix(16) + mix(8) + mix(0)
+	end
+	local set_fzf_highlights = function()
+		local get = function(name)
+			return vim.api.nvim_get_hl(0, { name = name, link = false })
+		end
+		local fg = get("Normal").fg or (vim.o.background == "light" and 0x000000 or 0xffffff)
+		local tint = get("StatusLine").bg or (vim.o.background == "light" and 0xeeeeee or 0x222222)
+		local set = vim.api.nvim_set_hl
+		set(0, "FzfLuaBackdrop", { bg = "#000000" })
+		set(0, "FzfLuaNormal", { fg = fg, bg = tint })
+		set(0, "FzfLuaBorder", { fg = get("FloatBorder").fg, bg = tint })
+		set(0, "FzfLuaTitle", { fg = fg, bg = tint, bold = true })
+		set(0, "FzfLuaCursorLine", { bg = blend(tint, fg, 0.12) })
+		for _, name in ipairs({ "FzfLuaPreviewNormal", "FzfLuaPreviewBorder", "FzfLuaPreviewTitle" }) do
+			set(0, name, { link = name:gsub("Preview", "") })
+		end
+	end
+	set_fzf_highlights()
+	Config.new_autocmd("ColorScheme", nil, set_fzf_highlights, "Tint fzf picker")
 
 	local nmap_leader = function(suffix, rhs, desc)
 		vim.keymap.set("n", "<Leader>" .. suffix, rhs, { desc = desc })

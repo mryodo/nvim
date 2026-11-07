@@ -41,7 +41,24 @@ now(function()
 end)
 
 now(function()
-	require("mini.starter").setup()
+	local starter = require("mini.starter")
+	starter.setup({
+		header = function()
+			local hour = tonumber(os.date("%H"))
+			local part = hour < 12 and "morning" or hour < 18 and "afternoon" or "evening"
+			return "Good " .. part .. "\n" .. vim.fn.fnamemodify(vim.fn.getcwd(), ":~")
+		end,
+		items = {
+			starter.sections.sessions(5, true),
+			starter.sections.recent_files(8, true),
+			starter.sections.builtin_actions(),
+		},
+		content_hooks = {
+			starter.gen_hook.adding_bullet("▏ "),
+			starter.gen_hook.aligning("center", "center"),
+		},
+		footer = "",
+	})
 end)
 
 now_if_args(function()

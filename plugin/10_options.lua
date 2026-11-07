@@ -87,7 +87,7 @@ vim.o.number          = true                    -- Show line numbers
 vim.o.relativenumber  = true                    -- Show line numbers relative to the cursor
 vim.o.report          = 20                      -- Don't report on small line-count changes
 vim.o.ruler           = false                   -- Don't show cursor coordinates
-vim.o.scrolloff       = 3                       -- Keep this many lines above/below the cursor
+vim.o.scrolloff       = 8                       -- Keep this many lines above/below the cursor
 vim.o.smoothscroll    = true                    -- Scroll by screen line, not by (long, wrapped) buffer line
 vim.o.shortmess       = 'CFOSWacoI'             -- Disable some built-in completion/intro messages
 vim.o.showmode        = false                   -- Don't show mode in command line
@@ -101,7 +101,7 @@ vim.o.termsync        = true                    -- Batch each redraw into one at
 vim.o.pumblend        = 0                       -- No pseudo-transparency: blended cells are recomposited on every redraw
 vim.o.winblend        = 0
 vim.o.title           = true                    -- Put file name and path in window title
-vim.o.winborder       = 'single'                -- Use border in floating windows
+vim.o.winborder       = 'rounded'                -- Use border in floating windows
 
 -- Command line. 'blink.cmp' completes `:` commands (see 'plugin/94_completion.lua'),
 -- so the built-in 'wildmenu' would only draw a second, worse menu underneath it.
@@ -110,7 +110,7 @@ vim.o.wildmode        = ''
 vim.o.more            = false                   -- Never page long output with the "-- More --" prompt
 
 -- Popup menu (built-in completion and 'blink.cmp')
-vim.o.pumborder       = 'bold'
+vim.o.pumborder       = 'rounded'
 vim.o.pumheight       = 10                      -- Make popup menu smaller
 vim.o.pummaxwidth     = 100                     -- Make popup menu not too wide
 vim.o.pumwidth        = 30                      -- Make popup menu not too narrow
@@ -123,17 +123,10 @@ vim.o.breakindentopt  = 'shift:0,min:20,sbr'    -- Keep wrapped lines readable a
 vim.o.showbreak       = '↳ '
 
 -- Special UI symbols. 'fillchars' is set in 'plugin/30_mini.lua' (see note above).
-vim.o.listchars       = 'extends:⟩,nbsp:␣,space:·,tab:——-,trail:·'
+vim.o.listchars       = 'extends:⟩,nbsp:␣,tab:——-,trail:·'
 
--- Caret blinking pattern
-vim.o.guicursor       = table.concat({
-  'n-v-c:block-Cursor/lCursor-blinkon1',
-  'i-ci-ve:ver25-Cursor/lCursor-blinkon1',
-  'r-cr:hor20',
-  'o:hor50',
-  'a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor',
-  'sm:block-blinkwait175-blinkoff150-blinkon175',
-}, ',')
+-- Caret shape (steady: every blink is a redraw)
+vim.o.guicursor       = 'n-v-c-sm:block-Cursor/lCursor,i-ci-ve:ver25-Cursor/lCursor,r-cr-o:hor20'
 
 vim.g.nerd_font_is_present = true
 
@@ -141,7 +134,7 @@ vim.g.nerd_font_is_present = true
 vim.o.foldmethod      = 'expr'
 vim.o.foldexpr        = 'v:lua.vim.treesitter.foldexpr()'
 vim.o.foldtext        = ''                      -- Show text under fold with its highlighting
-vim.o.foldcolumn      = '1'
+vim.o.foldcolumn      = '0'
 vim.o.foldenable      = true
 vim.o.foldlevel       = 99                      -- Fold nothing by default
 vim.o.foldlevelstart  = 99
@@ -223,11 +216,14 @@ local diagnostic_opts = {
 
 	virtual_lines = false,
 
+	-- Message inline, but only on the cursor line
+	virtual_text = { current_line = true },
+
 	float = {
 		border = "rounded",
 		source = "if_many",
-		header = "DIAGNOSTICS",
-		prefix = " ● ",
+		header = "",
+		prefix = "",
 	},
 
 	-- Don't update diagnostics when typing

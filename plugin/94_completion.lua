@@ -236,10 +236,10 @@ now(function()
 			-- is reachable with <C-space> on an already-selected item.
 			documentation = {
 				auto_show = false,
-				window = { border = "single" },
+				window = { border = "rounded" },
 			},
 			menu = {
-				border = "single",
+				border = "rounded",
 				auto_show = true,
 				-- Don't build and paint the menu on every keystroke of a burst,
 				-- but short enough that it still feels instant on a pause.

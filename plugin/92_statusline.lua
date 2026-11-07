@@ -391,6 +391,9 @@ later(function()
 				{
 					"lsp_progress",
 					color = secondary,
+					-- The component already writes its percentage sign as `%%`,
+					-- which the escape below would double into a literal `%%`.
+					separators = { percentage = { pre = "", post = "% " } },
 					fmt = function(str)
 						-- Should fix "E539: Illegal character <,>" error
 						return require("lualine.utils.utils").stl_escape(str)

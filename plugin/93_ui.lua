@@ -404,7 +404,7 @@ end)
 later(function()
 	add({ "https://github.com/folke/which-key.nvim" })
 	local wk = require("which-key")
-	wk.setup({})
+	wk.setup({ preset = "helix" })
 	for _, clue in ipairs(Config.leader_group_clues) do
 		wk.add({ clue.keys, group = clue.desc:sub(2), mode = clue.mode })
 	end
@@ -433,7 +433,7 @@ later(function()
 			view = { group_separator = "───" },
 			window = {
 				winblend = 0,
-				border = "single",
+				border = "rounded",
 				normal_hl = "Comment",
 				x_padding = 1,
 			},

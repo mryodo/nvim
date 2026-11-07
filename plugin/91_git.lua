@@ -63,7 +63,7 @@ later(function()
 		current_line_blame_formatter = "<author>, <author_time:%m/%d/%y>, <author_time:%I:%M %p> · <summary>",
 		preview_config = {
 			-- Options passed to nvim_open_win
-			border = "single",
+			border = "rounded",
 			style = "minimal",
 			relative = "cursor",
 			row = 0,
