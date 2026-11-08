@@ -169,6 +169,20 @@ later(function()
 		close = { enable = false },
 		scroll = { timing = animate.gen_timing.linear({ duration = 80, unit = "total" }) },
 	})
+
+	-- Mouse wheel: skip the animation. Each tick ('mousescroll' ver:25) starts a
+	-- new scroll animation while the previous one is still running, and the two
+	-- fight over the view, so the screen jitters back and forth. Animation is
+	-- off while the wheel is moving and comes back 150ms after the last tick.
+	local timer = vim.uv.new_timer()
+	for _, key in ipairs({ "<ScrollWheelUp>", "<ScrollWheelDown>" }) do
+		vim.keymap.set({ "n", "x", "i" }, key, function()
+			vim.g.minianimate_disable = true
+			timer:stop()
+			timer:start(150, 0, vim.schedule_wrap(function() vim.g.minianimate_disable = false end))
+			return key
+		end, { expr = true })
+	end
 end)
 
 later(function()
