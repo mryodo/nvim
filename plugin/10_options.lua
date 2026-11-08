@@ -80,7 +80,7 @@ vim.g.clipboard = {
 vim.o.cmdheight       = 0                       -- Hide command line until it is needed
 vim.o.colorcolumn     = '+1'                    -- Draw column on the right of maximum width
 vim.o.cursorline      = true                    -- Enable current line highlighting
-vim.o.cursorlineopt   = 'number'                -- Highlight only the cursor's line number
+vim.o.cursorlineopt   = 'number,line'           -- Faint line tint ('plugin/90_theme_compat.lua') plus the number
 vim.o.inccommand      = 'split'                 -- Preview substitutions live, as you type
 vim.o.list            = true                    -- Show helpful text indicators
 vim.o.number          = true                    -- Show line numbers
@@ -123,7 +123,7 @@ vim.o.breakindentopt  = 'shift:0,min:20,sbr'    -- Keep wrapped lines readable a
 vim.o.showbreak       = '↳ '
 
 -- Special UI symbols. 'fillchars' is set in 'plugin/30_mini.lua' (see note above).
-vim.o.listchars       = 'extends:⟩,nbsp:␣,tab:——-,trail:·'
+vim.o.listchars       = 'extends:⟩,nbsp:␣,tab:——-' -- No `trail`: 'mini.trailspace' already marks it
 
 -- Caret shape (steady: every blink is a redraw)
 vim.o.guicursor       = 'n-v-c-sm:block-Cursor/lCursor,i-ci-ve:ver25-Cursor/lCursor,r-cr-o:hor20'
@@ -225,6 +225,14 @@ local highlight_yank = function()
 	vim.hl.on_yank({ timeout = 150 })
 end
 Config.new_autocmd("TextYankPost", nil, highlight_yank, "Highlight yanked text")
+
+-- Relative numbers only in the focused window; the others show plain ones
+local set_relnum = function(ev)
+	if vim.wo.number then
+		vim.wo.relativenumber = ev.event == "WinEnter"
+	end
+end
+Config.new_autocmd({ "WinEnter", "WinLeave" }, nil, set_relnum, "Relative numbers in focused window")
 
 -- There are other autocommands created by 'mini.basics'. See 'plugin/30_mini.lua'.
 

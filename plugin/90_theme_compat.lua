@@ -156,8 +156,13 @@ local apply_surfaces = function()
 	set(0, "PmenuSbar", { bg = tint })
 	set(0, "PmenuThumb", { bg = comment })
 
-	-- Inactive windows: plain text pushed a third of the way to the background
+	-- Inactive windows: plain text pushed a third of the way to the background.
+	-- No `bg`: 'NormalNC' also paints unfocused floats that don't remap
+	-- `Normal` in 'winhighlight' (e.g. 'nvim-treesitter-context'), erasing their tint.
 	set(0, "NormalNC", { fg = blend(fg, bg, 0.35) })
+
+	-- Cursor line: barely-there tint ('cursorlineopt' includes `line`)
+	set(0, "CursorLine", { bg = blend(bg, fg, 0.04) })
 
 	-- Sticky scroll ('nvim-treesitter-context', 'plugin/93_ui.lua'), with a
 	-- faint rule under the last pinned line
