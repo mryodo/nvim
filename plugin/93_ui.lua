@@ -285,30 +285,6 @@ later(function()
 			options = { cursorline = true },
 		},
 	})
-
-	-- Prose opens centred. Only for a real file alone on screen, so hover and
-	-- preview floats (also 'markdown') and existing splits are left alone.
-	local prose_zen = function(args)
-		vim.schedule(function()
-			local win = vim.api.nvim_get_current_win()
-			if vim.bo[args.buf].buftype ~= "" or vim.api.nvim_win_get_buf(win) ~= args.buf then
-				return
-			end
-			local splits = vim.tbl_filter(function(w)
-				return vim.api.nvim_win_get_config(w).relative == ""
-			end, vim.api.nvim_tabpage_list_wins(0))
-			if vim.api.nvim_win_get_config(win).relative ~= "" or #splits > 1 then
-				return
-			end
-			require("zen-mode").open()
-		end)
-	end
-	local prose = { "markdown", "tex", "typst" }
-	Config.new_autocmd("FileType", prose, prose_zen, "Centre prose with zen-mode")
-	-- A file given on the command line got its `FileType` before this ran
-	if vim.tbl_contains(prose, vim.bo.filetype) then
-		prose_zen({ buf = vim.api.nvim_get_current_buf() })
-	end
 end)
 
 -- Messages and notifications =================================================
